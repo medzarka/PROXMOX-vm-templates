@@ -1,0 +1,167 @@
+#!/bin/sh
+
+#####################################################
+############### Config
+
+mkdir -p /etc/update-and-backup/logs
+
+update_test_file=/etc/update-and-backup/update.test
+backup_test_file=/etc/update-and-backup/backup.test
+
+backup_list_file=/etc/update-and-backup/backup.list
+
+log_file=/var/log/update-and-backup.log
+
+WEBDAV_USERNAME=webdav
+
+export BORG_REPO_DIR='/opt/backups'
+mkdir -p $BORG_REPO_DIR
+mkdir -p /etc/update-and-backup/
+
+#####################################################
+############### Random sleep
+
+# The idea behind this sleep is to prevent to case that all the VMs 
+# will start the update and the backup in the same time.
+#/bin/sleep `/usr/bin/expr $RANDOM % 600`
+
+#####################################################
+#####################################################
+#####################################################
+#####################################################
+#####################################################
+############### Update
+#####################################################
+#####################################################
+#####################################################
+#####################################################
+#####################################################
+
+
+update_date_start=$(date +'%m-%d-%Y--%H:%M:%S')
+echo "------------------------------------" >> $log_file 2>&1
+echo "Start daily system update at ${update_date_start}" >> $log_file 2>&1
+
+if [ -e $update_test_file ]
+then
+    /sbin/apk update >> $log_file 2>&1
+    /sbin/apk upgrade --no-cache --available >> $log_file 2>&1
+else
+    echo "Update ignored (create an empty file named $update_test_file file in order to activate system update)." >> $log_file 2>&1
+fi
+
+update_date_end=$(date +'%m-%d-%Y--%H:%M:%S')
+echo "Update ended at ${update_date_end}" >> $log_file 2>&1
+
+
+#####################################################
+#####################################################
+#####################################################
+#####################################################
+#####################################################
+############### Backup
+#####################################################
+#####################################################
+#####################################################
+#####################################################
+#####################################################
+#####################################################
+
+
+backup_date_start=$(date +'%m-%d-%Y  %H:%M:%S')
+echo "------------------------------------" >> $log_file
+echo "Start daily system backup at ${backup_date_start}" >> $log_file
+if [ -e \$backup_test_file ]
+then
+
+    #####################################################
+    
+    echo "" >> $log_file
+    mount_date_start=$(date +'%m-%d-%Y  %H:%M:%S')
+    echo " -- Mounting remote backup dir at ${mount_date_start}" >> $log_file 2>&1
+    # Reading from env file
+    touch /etc/update-and-backup/.env
+    export $(xargs < /etc/update-and-backup/.env) >> /dev/null 2>&1
+
+    if [ -n "$WEBDAV_PASSWORD" ]
+    then
+        echo "The webdav password is well provided" >> $log_file 2>&1
+    else
+        echo "The variable WEBDAV_PASSWORD is not provided in the .env file. Exiting..." >> $log_file 2>&1
+        exit 1
+    fi
+
+    if [ -n "$BACKUP_MACHINE_IP" ]
+    then
+        echo "The webdav machine ip is well provided" >> $log_file 2>&1
+    else
+        echo "The variable BACKUP_MACHINE_IP is not provided in the .env file. Exiting..." >> $log_file 2>&1
+        exit 1
+    fi
+    echo "$BORG_REPO_DIR $WEBDAV_USERNAME $WEBDAV_PASSWORD" >> /etc/davfs2/secrets
+    chmod 600 /etc/davfs2/secrets
+    echo y | mount -t davfs https://$BACKUP_MACHINE_IP/uploads $BORG_REPO_DIR
+    ## here we will continue only if the file $BORG_REPO_DIR/is_mounted exists
+    mount_date_end=$(date +'%m-%d-%Y--%H:%M:%S')
+    echo "The remote backup dir is mounter at ${mount_date_end}" >> $log_file 2>&1
+   
+    #####################################################
+    echo "" >> $log_file
+    echo " -- Starting Backups" >> $log_file 2>&1
+    d=$' '
+    while IFS=$d, read -r col1 col2
+    do
+        if [ "$col1" = "" || $col1 = \#* ] # test if the line is valid.
+        then
+            echo "####    Line ignored"
+        else
+            echo ""
+            echo ""
+            echo "####    Handling the line: \${col1} :: \${col2}"
+            echo ""
+            mkdir -p $BORG_REPO_DIR/$col1
+            if [ -e "$BORG_REPO_DIR/$col1/backup.init" ]
+            then
+                echo "     The backup is already initialized for ${col1}." >> $log_file 2>&1
+            else
+                echo "     Initializing the backup for $col1." >> $log_file 2>&1
+                borg init --encryption none $BORG_REPO_DIR/$col1 >> $log_file 2>&1
+                touch $BORG_REPO_DIR/$col1/backup.init
+                echo "     Initialization done for ${col1}." >> $log_file 2>&1
+            fi
+
+            echo "     Backup: #${col1} ..."  >> $log_file 2>&1
+            export TIME=$(date '+%Y-%m-%d %H:%M')  
+            /usr/bin/borg create $BORG_REPO_DIR/$col1::"Auto $TIME" $col2  >> $log_file 2>&1
+            echo "     Pruning Backup" >> $log_file 2>&1
+            /usr/bin/borg prune -v --list --keep-hourly=3 --keep-daily=3 --keep-monthly=3  $BORG_REPO_DIR/$col1 >> $log_file 2>&1
+
+            echo "     Compacting Backup" >> $log_file 2>&1 
+            /usr/bin/borg compact $BORG_REPO_DIR/$col1 >> $log_file 2>&1
+            echo "     Done." >> $log_file 2>&1
+        fi
+
+    done < \$log_file
+
+
+    #####################################################
+    cp $log_file $BORG_REPO_DIR
+
+    echo "" >> $log_file
+    echo " -- Unmouting the remote backup dir." >> $log_file 2>&1
+    umount $BORG_REPO_DIR >> $log_file 2>&1
+
+
+else
+    echo "Backups ignored. (create the file $backup_test_file to activate it)." >> $log_file 2>&1
+fi
+backup_date_end=$(date +'%m-%d-%Y  %H:%M:%S')
+echo "Backup ended at ${backup_date_end}" >> $log_file 2>&1
+echo ""
+echo ""
+echo ""
+echo ""
+
+#####################################################
+
+
