@@ -55,31 +55,19 @@ destroy_old_vm $TEMPLATE_VM_ID
 ### Create new Template
 create_new_template
 
+
+
 #############################################################
-echo "Install alpine 3.19 ..."
+echo "Install Ubuntu 24.04 ..."
 echo "----------------------------------------------------------------------------------------"
-echo "This process is manual:"
-echo "     -  In the boot process, press ESC to select boot. Then select the install cdrom,"
-echo "     -  Login with root username (no password will be required),"
-echo "     -  Type: setup-alpine,"
-echo "     -  As a hostname, select: template-alpine-3.19,"
-echo "     -  As network interface, type eth0,"
-echo "     -  As network address, type dhcp,"
-echo "     -  As network interface, type eth0, then no,"
-echo "     -  Type a password for the root user,"
-echo "     -  Type Asia/Riyadh as a timezone"
-echo "     -  If it asks to create new user, answer with no,"
-echo "     -  Select openssh as an ssh server,"
-echo "     -  For the install disk, type sda, then lvm, and finally sys,"
-echo "     -  Reboot."
-echo "----------------------------------------------------------------------------------------"
-echo "Notice: you can delete the Install CROM after the install."
-echo "----------------------------------------------------------------------------------------"
-echo "Post-task: login to the root user, copy the setup file, and run it (using qm terminal VMID)."
+echo "Post-task: login to the ubuntu user, copy the setup file, and run it."
 echo "----------------------------------------------------------------------------------------"
 
+
+# TODO
+
 #doas apk add parted
-#doas parted -s -a opt /dev/sda "print free" "resizepart 2 100%" "print free"
+#doas parted -s -a opt /dev/sda "print free" "resizepart 3 100%" "print free"
 
 #pvresize /dev/sda2 # extend the physical volume /dev/sda2
 #pvdisplay # to check

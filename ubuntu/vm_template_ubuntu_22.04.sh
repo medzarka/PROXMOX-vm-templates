@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "-----------------------------------------------------------------"
-echo "Create a Linux alpine 3.19 template VM"
+echo "Create a Ubuntu Linux 22.04 template VM"
 echo "-----------------------------------------------------------------"
 
 # [x] Load common configs from the common scripts
@@ -10,16 +10,16 @@ source ../lib/common_vm_scripts.sh
 
 # [x] Specific VM template configurations
 # Specific configs
-TEMPLATE_VM_ID=5001
+TEMPLATE_VM_ID=5122
 TEMPLATE_TYPE=template
-TEMPLATE_OS=alpine
-TEMPLATE_VERSION=3.19
-RAM=512
+TEMPLATE_OS=ubuntu
+TEMPLATE_VERSION=22.04
+RAM=1024
 CORES=1
 DISKIMAGE_SIZE=1 
 
-IMAGE_URL=https://filedn.com/luEnu9wIDvzholR0Mi4tGLb/linux_images/alpine_3.19_image.raw
-IMAGE_NAME=alpine_3.19_image.raw
+IMAGE_URL=https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
+IMAGE_NAME=jammy-server-cloudimg-amd64.img
 IMAGE_PATH=/var/lib/vz/template/cache/$IMAGE_NAME
 
 # [x] Load common VM template configurations
@@ -54,36 +54,3 @@ destroy_old_vm $TEMPLATE_VM_ID
 #############################################################
 ### Create new Template
 create_new_template
-
-#############################################################
-echo "Install alpine 3.19 ..."
-echo "----------------------------------------------------------------------------------------"
-echo "This process is manual:"
-echo "     -  In the boot process, press ESC to select boot. Then select the install cdrom,"
-echo "     -  Login with root username (no password will be required),"
-echo "     -  Type: setup-alpine,"
-echo "     -  As a hostname, select: template-alpine-3.19,"
-echo "     -  As network interface, type eth0,"
-echo "     -  As network address, type dhcp,"
-echo "     -  As network interface, type eth0, then no,"
-echo "     -  Type a password for the root user,"
-echo "     -  Type Asia/Riyadh as a timezone"
-echo "     -  If it asks to create new user, answer with no,"
-echo "     -  Select openssh as an ssh server,"
-echo "     -  For the install disk, type sda, then lvm, and finally sys,"
-echo "     -  Reboot."
-echo "----------------------------------------------------------------------------------------"
-echo "Notice: you can delete the Install CROM after the install."
-echo "----------------------------------------------------------------------------------------"
-echo "Post-task: login to the root user, copy the setup file, and run it (using qm terminal VMID)."
-echo "----------------------------------------------------------------------------------------"
-
-#doas apk add parted
-#doas parted -s -a opt /dev/sda "print free" "resizepart 2 100%" "print free"
-
-#pvresize /dev/sda2 # extend the physical volume /dev/sda2
-#pvdisplay # to check
-#lvextend -l +100%FREE  /dev/vg0/lv_root
-#resize2fs /dev/vg0/lv_root
-# ---> in the VM:
-

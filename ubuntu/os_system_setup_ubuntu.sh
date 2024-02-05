@@ -13,7 +13,7 @@ sudo apt upgrade -y
 # NOTE The code is working and tested on ubuntu linux 24.04 
 echo "------------------------------------------------------------------------"
 echo "Install required softwares..."
-sudo apt install --no-install-recommends neofetch htop chrony tzdata nano  -y
+sudo apt install --no-install-recommends neofetch htop chrony tzdata nano parted -y
 
 ## ------------------------------------------------------------------------
 # [x] F3 - F3 Setup NTP to Asia/Riyadh
@@ -74,8 +74,7 @@ sudo systemctl restart ssh
 
 # [x] F9 Delete the root password
 # NOTE The code is working and tested on ubuntu linux 24.04 
-# RECHECK
-passwd -d root  # to delete the password.
+sudo passwd -d root  # to delete the password.
 #passwd -l root  # to lock the user.
 #echo "Update root password ..."
 #sudo pass generate system/root 50
@@ -128,10 +127,10 @@ sudo systemctl mask systemd-networkd-wait-online.service
 echo "------------------------------------------------------------------------"
 echo "configure update sceript and backup's folders list ..."
 
-cat << EOF > /root/update.sh
+sudo bash -c 'cat << EOF > /root/update.sh
 #!/bin/bash
 # --- Configs
-log_file=/var/log/update-and-backup.log
+log_file=/var/log/system-update.log
 
 # --- Update
 update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
@@ -149,19 +148,18 @@ echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 
 # --- Done
-EOF
-chmod a+x /root/update.sh
+EOF'
+sudo chmod a+x /root/update.sh
 
 
-cat << EOF > /root/backup.list
+sudo bash -c 'cat << EOF > /root/backup.list
 CONFIGS /etc
 ROOT    /root
 LOGS    /var/log
-EOF
+EOF'
 
 # [x] Last step - Cleaning the system
 # NOTE The code is working and tested on ubuntu linux 24.04 
-# RECHECK
 
 echo "Cleaning the package system ..."
 sudo rm -rf /config/* /tmp/* /var/lib/apt/lists/* /var/tmp/* 
@@ -179,7 +177,7 @@ sudo find /home -type f  -name '.ash_history' -delete
 sudo shred -u /etc/ssh/*_key /etc/ssh/*_key.pub   # remove host keys
 sudo rm -f /root/.ssh/authorized_keys
 sudo find /home -type f  -name 'authorized_keys' -delete
-sudo rc-service sshd restart
+sudo systemctl restart ssh
 
 # clean cloud init data
 sudo cloud-init clean

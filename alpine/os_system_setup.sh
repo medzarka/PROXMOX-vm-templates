@@ -13,7 +13,7 @@ apk upgrade --no-cache --available
 # NOTE The code is working and tested on alpine linux 3.19 
 echo "------------------------------------------------------------------------"
 echo "Install required softwares ..."
-apk --no-cache add neofetch htop chrony doas tzdata nano parted bash
+apk --no-cache add neofetch htop chrony doas tzdata nano parted bash parted
 apk --no-cache add python3 py3-pip py3-pyserial py3-netifaces # required for cloud init
 
 # [x] F3 Setup NTP to Asia/Riyadh
@@ -146,7 +146,7 @@ echo "configure update sceript and backup's folders list ..."
 cat << EOF > /root/update.sh
 #!/bin/sh
 # --- Configs
-log_file=/var/log/update-and-backup.log
+log_file=/var/log/system-update.log
 
 # --- Update
 update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
