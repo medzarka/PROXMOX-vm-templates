@@ -16,7 +16,8 @@ TEMPLATE_OS=ubuntu
 TEMPLATE_VERSION=22.04
 RAM=1024
 CORES=1
-DISKIMAGE_SIZE=1 
+# RECHECK check the size
+DISKIMAGE_SIZE=4 
 
 IMAGE_URL=https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
 IMAGE_NAME=jammy-server-cloudimg-amd64.img
