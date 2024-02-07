@@ -13,7 +13,7 @@ template_os_setup(){
     while true; do
         RESULT=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEFAULT_USER@$IP 'sh -s' < os_system_setup.sh)
         echo $?
-        if [ ${#RESULT} -eq 0 ]; then 
+        if [ $? -ne 0 ]; then 
             echo "  waiting the system to be fully loaded ..."
             sleep 5
         else 
@@ -37,7 +37,7 @@ create_new_template(){
     sudo qm set $TEMPLATE_VM_ID --memory $RAM 
     sudo qm set $TEMPLATE_VM_ID --machine q35 
     sudo qm set $TEMPLATE_VM_ID --ostype l26 
-    sudo qm set $TEMPLATE_VM_ID --numa 1 
+    #sudo qm set $TEMPLATE_VM_ID --numa 1 
     sudo qm set $TEMPLATE_VM_ID --cores $CORES --cpu cputype=host 
     sudo qm set $TEMPLATE_VM_ID --scsihw virtio-scsi-single
     sudo qm importdisk $TEMPLATE_VM_ID $IMAGE_PATH $STORAGE
