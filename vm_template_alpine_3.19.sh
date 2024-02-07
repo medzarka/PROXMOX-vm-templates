@@ -61,7 +61,7 @@ create_new_template
 ### Start the VM template, wait it to start, and then execute the setup script 
 sudo qm start $TEMPLATE_VM_ID
 sleep 20
-ssh $DEFAULT_USER@$IP 'sh -s' < os_system_steup.sh
+ssh $DEFAULT_USER@$IP 'sh -s' < os_system_setup.sh
 
 
 
