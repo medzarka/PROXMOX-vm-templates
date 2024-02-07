@@ -2,6 +2,13 @@
 
 # NOTE - Template scripts
 
+template_os_setup(){
+    sudo qm start $TEMPLATE_VM_ID
+    sleep 30
+    ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null  $DEFAULT_USER@$IP 'sh -s' < os_system_setup.sh
+    sudo qm stop $TEMPLATE_VM_ID
+}
+
 create_new_template(){
     echo "-----------------------------------------------------------------"
     echo "Create the new VM Template ..."
@@ -30,7 +37,6 @@ create_new_template(){
     #sudo qm set $TEMPLATE_VM_ID --ipconfig0 ip=dhcp,ip6=auto 
     sudo qm set $TEMPLATE_VM_ID --nameserver $DNS 
     sudo qm set $TEMPLATE_VM_ID --searchdomain $MAIN_DOMAIN 
-     
 }
 
 
