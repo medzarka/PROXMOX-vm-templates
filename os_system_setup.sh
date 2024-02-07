@@ -531,6 +531,7 @@ echo " --- Shutdown the VM"
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
 sudo shutdown -h now
+fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
 doas poweroff
