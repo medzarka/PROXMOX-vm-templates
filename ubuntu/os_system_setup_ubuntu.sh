@@ -2,7 +2,7 @@
 ######################### Ubuntu 24.04 template setup script #############################
 
 # [x] F1 - Update the system ..
-# NOTE The code is working and tested on ubuntu linux 24.04 
+# NOTE The code is working and tested on ubuntu linux 24.04 /22.04
 echo "------------------------------------------------------------------------"
 echo "Update the system ..."
 sudo apt update
@@ -10,21 +10,21 @@ sudo apt upgrade -y
 
 ## ------------------------------------------------------------------------
 # [x] F2 - Install required softwares
-# NOTE The code is working and tested on ubuntu linux 24.04 
+# NOTE The code is working and tested on ubuntu linux 24.04 /22.04
 echo "------------------------------------------------------------------------"
 echo "Install required softwares..."
 sudo apt install --no-install-recommends neofetch htop chrony tzdata nano parted -y
 
 ## ------------------------------------------------------------------------
 # [x] F3 - F3 Setup NTP to Asia/Riyadh
-# NOTE The code is working and tested on ubuntu linux 24.04 
+# NOTE The code is working and tested on ubuntu linux 24.04 /22.04
 echo "Setup NTP to Asia/Riyadh ..."
 sudo timedatectl set-timezone Asia/Riyadh
 sudo timedatectl # to check
 
 ## ------------------------------------------------------------------------
 # [x] F4 Install KVM guest agent (QEMU)
-# NOTE The code is working and tested on ubuntu linux 24.04 
+# NOTE The code is working and tested on ubuntu linux 24.04 /22.04
 echo "Install KVM guest agent (QEMU) ..."
 sudo apt install --no-install-recommends qemu-guest-agent -y
 sudo systemctl enable qemu-guest-agent
@@ -41,7 +41,7 @@ echo "------------------------------------------------------------------------"
 echo "configure sudo and doas (no password required when using doas) ..."
 
 # [x] F7 Configure the firewall
-# NOTE The code is working and tested on ubuntu linux 24.04 
+# NOTE The code is working and tested on ubuntu linux 24.04 /22.04
 echo "------------------------------------------------------------------------"
 echo "Configure the firewall (22 only is accessible) ..."
 sudo apt install --no-install-recommends ufw -y
@@ -61,7 +61,7 @@ sudo systemctl enable ufw
 sudo systemctl restart ufw 
 
 # [x] F8 Hardening SSH
-# NOTE The code is working and tested on ubuntu linux 24.04 
+# NOTE The code is working and tested on ubuntu linux 24.04 /22.04
 echo "------------------------------------------------------------------------"
 echo "Hardening SSH ..."
 sudo sed -r -i 's/^#?UseDNS.*/UseDNS no/g' /etc/ssh/sshd_config # By setting this to no, connection speed can increase.
@@ -73,7 +73,7 @@ sudo sed -r -i 's/^#?PasswordAuthentication.*/PasswordAuthentication no/g' /etc/
 sudo systemctl restart ssh
 
 # [x] F9 Delete the root password
-# NOTE The code is working and tested on ubuntu linux 24.04 
+# NOTE The code is working and tested on ubuntu linux 24.04 /22.04
 sudo passwd -d root  # to delete the password.
 #passwd -l root  # to lock the user.
 #echo "Update root password ..."
@@ -82,11 +82,13 @@ sudo passwd -d root  # to delete the password.
 
 ## ------------------------------------------------------------------------
 # [x] F10 - OK - Disable IPV6
-# NOTE The code is working and tested on ubuntu linux 24.04 
+# NOTE The code is working and tested on ubuntu linux 24.04 /22.04
 echo "------------------------------------------------------------------------"
 echo "Diable IPV6 ..."
+# Only for Ubuntu and debian 12 ---------
 sudo sed -r -i 's/dhcp6:.*/link-local: [ ipv4 ]/g' /etc/netplan/50-cloud-init.yaml
 # it will be reset after cloud-init clean
+# -------------------------
 
 sudo bash -c 'cat << EOF > /etc/sysctl.d/99-disable-ipv6.conf
 # Diable IPV6 (Comment the three following lines to get IPV6 back)
@@ -108,12 +110,14 @@ sudo chmod +x /etc/cron.hourly/disable-ipv6
 sudo run-parts --test /etc/cron.hourly # to check
 
 # [x] F11 System Tweak
-# NOTE The code is working and tested on ubuntu linux 24.04 
+# NOTE The code is working and tested on ubuntu linux 24.04 /22.04
 echo "------------------------------------------------------------------------"
 echo "System Tweak ..."
 
 echo "Avoid Network wait ..."
+# Only for Ubuntu ---------
 sudo systemctl disable lxd-agent
+# -------------------------
 sudo systemctl disable systemd-networkd-wait-online.service
 sudo systemctl mask systemd-networkd-wait-online.service
 
@@ -129,10 +133,7 @@ echo "configure update sceript and backup's folders list ..."
 
 sudo bash -c 'cat << EOF > /root/update.sh
 #!/bin/bash
-# --- Configs
 log_file=/var/log/system-update.log
-
-# --- Update
 update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
 echo "------------------------------------" >> \$log_file 2>&1
 echo "Start system update at \${update_date_start}" >> \$log_file 2>&1
@@ -146,7 +147,6 @@ echo "Update ended at \${update_date_end}" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
-
 # --- Done
 EOF'
 sudo chmod a+x /root/update.sh
@@ -159,7 +159,7 @@ LOGS    /var/log
 EOF'
 
 # [x] Last step - Cleaning the system
-# NOTE The code is working and tested on ubuntu linux 24.04 
+# NOTE The code is working and tested on ubuntu linux 24.04 /22.04
 
 echo "Cleaning the package system ..."
 sudo rm -rf /config/* /tmp/* /var/lib/apt/lists/* /var/tmp/* 
@@ -169,7 +169,7 @@ sudo apt-get -y autoremove
 sudo rm -rf /var/lib/apt/lists/*
 
 # clean shell history
-sudo unset HISTFILE; 
+unset HISTFILE; 
 sudo rm -rf /root/.*history     # remove command history
 sudo find /home -type f  -name '.ash_history' -delete
 
