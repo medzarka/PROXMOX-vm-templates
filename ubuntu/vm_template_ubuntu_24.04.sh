@@ -13,7 +13,7 @@ source ../lib/common_vm_scripts.sh
 TEMPLATE_VM_ID=5124
 TEMPLATE_TYPE=template
 TEMPLATE_OS=ubuntu
-TEMPLATE_VERSION=22.04
+TEMPLATE_VERSION=24.04
 RAM=1024
 CORES=1
 # RECHECK check the size

@@ -50,7 +50,7 @@ download_vm_disk_image(){
             echo "Download the VM disk image ..."
             wget -O $IMAGE_PATH  $IMAGE_URL
             du -sh $IMAGE_PATH
-            qemu-img resize $IMAGE_PATH $DISKIMAGE_SIZE
+            #qemu-img resize $IMAGE_PATH $DISKIMAGE_SIZE
             du -sh $IMAGE_PATH
         fi
 
