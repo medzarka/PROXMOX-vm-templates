@@ -153,8 +153,7 @@ doas modprobe -v ip6_tables # if IPv6 is used
 
 doas rc-update add iptables
 doas rc-update add ip6tables
-doas rc-service iptables restart
-doas rc-service ip6tables  restart
+
 
 doas sh -c 'cat << EOF > /etc/awall/optional/cloud-server.json
 {
@@ -229,6 +228,8 @@ doas awall enable ssh
 doas awall enable ping
 doas awall enable outgoing
 doas awall activate
+doas rc-service iptables restart
+doas rc-service ip6tables  restart
 
 
 #doas apk --no-cache add ufw
