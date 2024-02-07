@@ -27,9 +27,6 @@ template_os_setup(){
     
     echo "   shutdown the template"
     sudo qm stop $TEMPLATE_VM_ID
-
-    tttt=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null abc@192.168.50.2 'sh -s' < os_system_setup.sh)
-
 }
 
 create_new_template(){
