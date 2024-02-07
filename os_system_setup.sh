@@ -289,7 +289,7 @@ doas /sbin/update-extlinux --warn-only
 #sed -Ei -e '/^tty[0-9]/s/^/#/' -e '/^#ttyS0:/s/^#//' "/etc/inittab"
 fi
 if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-
+echo " "
 fi
 
 # [ ] F12 - configure update script and backup's folders list

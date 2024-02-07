@@ -62,6 +62,7 @@ create_new_template
 sudo qm start $TEMPLATE_VM_ID
 sleep 20
 ssh $DEFAULT_USER@$IP 'sh -s' < os_system_setup.sh
+ssh abc@192.168.50.2 'sh -s' < os_system_setup.sh
 
 
 
