@@ -12,9 +12,10 @@ template_os_setup(){
     echo "   execute the script on the template"
     while true; do
         RESULT=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEFAULT_USER@$IP 'sh -s' < os_system_setup.sh)
+        echo $?
         if [ ${#RESULT} -eq 0 ]; then 
             echo "  waiting the system to be fully loaded ..."
-            sleep 2
+            sleep 5
         else 
             break
         fi
