@@ -16,6 +16,7 @@ TEMPLATE_OS=alpine
 TEMPLATE_VERSION=3.19
 RAM=512
 CORES=1
+IP=192.168.50.1/24
 DISKIMAGE_SIZE=1 
 
 IMAGE_URL=https://filedn.com/luEnu9wIDvzholR0Mi4tGLb/linux_images/alpine_3.19_image.raw
@@ -37,7 +38,8 @@ create_retrive_specific_template_user_password_from_pass $TEMPLATE_VM_ID $DEFAUL
 USER_PASSWORD=$RETURN_VALUE
 
 TEMPLATE_NAME=${TEMPLATE_TYPE}-${TEMPLATE_OS}-${TEMPLATE_VERSION} 
-STORAGE=local-lvm   
+STORAGE=local-lvm  
+GW=192.168.50.1 
 DNS=192.168.50.1
 VLAN=50
 BRIDGE=vmbr1 

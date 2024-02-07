@@ -26,7 +26,8 @@ create_new_template(){
     sudo qm set $TEMPLATE_VM_ID --ciuser $DEFAULT_USER 
     sudo qm set $TEMPLATE_VM_ID --cipassword $(openssl passwd -6 $USER_PASSWORD) 
     sudo qm set $TEMPLATE_VM_ID --sshkeys /root/.ssh/authorized_keys 
-    sudo qm set $TEMPLATE_VM_ID --ipconfig0 ip=dhcp,ip6=auto 
+    sudo qm set $TEMPLATE_VM_ID --ipconfig0 ip=$IP,gw=$GW,ip6=auto
+    #sudo qm set $TEMPLATE_VM_ID --ipconfig0 ip=dhcp,ip6=auto 
     sudo qm set $TEMPLATE_VM_ID --nameserver $DNS 
     sudo qm set $TEMPLATE_VM_ID --searchdomain $MAIN_DOMAIN 
     sudo qm start $TEMPLATE_VM_ID 

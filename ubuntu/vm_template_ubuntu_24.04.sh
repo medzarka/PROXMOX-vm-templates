@@ -16,6 +16,7 @@ TEMPLATE_OS=ubuntu
 TEMPLATE_VERSION=24.04
 RAM=1024
 CORES=1
+IP=192.168.50.10/24
 # RECHECK check the size
 DISKIMAGE_SIZE=4 
 
@@ -39,6 +40,7 @@ USER_PASSWORD=$RETURN_VALUE
 
 TEMPLATE_NAME=${TEMPLATE_TYPE}-${TEMPLATE_OS}-${TEMPLATE_VERSION} 
 STORAGE=local-lvm   
+GW=192.168.50.1
 DNS=192.168.50.1
 VLAN=50
 BRIDGE=vmbr1 
@@ -63,3 +65,27 @@ echo "Install Ubuntu 24.04 VM template ..."
 echo "----------------------------------------------------------------------------------------"
 echo "Post-task: login to the ubuntu user, copy the setup file, and run it."
 echo "----------------------------------------------------------------------------------------"
+
+
+sudo apt install vim qemu-guest-agent iputils-ping git -y
+
+cloud-init clean
+
+tasksel --list-tasks
+
+sudo truncate -s 0 /etc/machine-id
+
+
+vi /etc/netplan/01-netcfg.yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens18:
+      dhcp4: no
+      addresses: [128.204.192.xxx/24]
+      gateway4: 128.204.192.1
+      nameservers:
+        addresses: [89.207.128.252,89.207.130.252]
+      dhcp6: no```
+netplan apply
