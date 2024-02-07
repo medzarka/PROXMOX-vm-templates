@@ -67,25 +67,25 @@ echo "Post-task: login to the ubuntu user, copy the setup file, and run it."
 echo "----------------------------------------------------------------------------------------"
 
 
-sudo apt install vim qemu-guest-agent iputils-ping git -y
+#sudo apt install vim qemu-guest-agent iputils-ping git -y
 
-cloud-init clean
+#cloud-init clean
 
-tasksel --list-tasks
+#tasksel --list-tasks
 
-sudo truncate -s 0 /etc/machine-id
+#sudo truncate -s 0 /etc/machine-id
 
 
-vi /etc/netplan/01-netcfg.yaml
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    ens18:
-      dhcp4: no
-      addresses: [128.204.192.xxx/24]
-      gateway4: 128.204.192.1
-      nameservers:
-        addresses: [89.207.128.252,89.207.130.252]
-      dhcp6: no```
-netplan apply
+#vi /etc/netplan/01-netcfg.yaml
+#network:
+#  version: 2
+#  renderer: networkd
+#  ethernets:
+#    ens18:
+#      dhcp4: no
+#      addresses: [128.204.192.xxx/24]
+#      gateway4: 128.204.192.1
+#      nameservers:
+#        addresses: [89.207.128.252,89.207.130.252]
+#      dhcp6: no```
+#netplan apply
