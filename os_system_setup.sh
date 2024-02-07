@@ -146,17 +146,18 @@ sudo systemctl restart ufw
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-doas apk add iptables
-doas modprobe -v ip_tables 
-doas rc-update add iptables
-doas rc-service iptables restart
-doas apk --no-cache add ufw
-doas ufw --force enable
-doas ufw default deny incoming
-doas ufw default allow outgoing
-doas ufw limit SSH  
-doas rc-service ufw restart
-doas rc-update add ufw default
+doas apk --no-cache add firewalld
+doas rc-service firewalld restart
+doas rc-update add firewalld default
+sudo firewall-cmd --permanent --add-service=ssh
+sudo firewall-cmd --reload
+#doas apk --no-cache add ufw
+#doas ufw --force enable
+#doas ufw default deny incoming
+#doas ufw default allow outgoing
+#doas ufw limit SSH  
+#doas rc-service ufw restart
+#doas rc-update add ufw default
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
