@@ -8,19 +8,21 @@ template_os_setup(){
 
     echo "   start the template"
     sudo qm start $TEMPLATE_VM_ID
-    
-    echo "   execute the script on the template"
+
+    echo "  waiting the system to be fully loaded and the port 22 is open."
     while true; do
-        ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEFAULT_USER@$IP 'sh -s' < os_system_setup.sh
+        nc -z -v -w5 $IP 22
         result=$?
-        if [ $result -ne 0 ]; then 
-            echo "  waiting the system to be fully loaded ..."
-            sleep 5
-        else 
-            break
+        if [  "$result1" != 0 ]; then
+            echo "     still waiting"
+            sleep 3
+        else
+            breaks
         fi
     done
-    #ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEFAULT_USER@$IP 'sh -s' < os_system_setup.sh
+
+    echo "   execute the script on the template"
+    ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEFAULT_USER@$IP 'sh -s' < os_system_setup.sh
     
     echo "   shutdown the template"
     sudo qm stop $TEMPLATE_VM_ID
