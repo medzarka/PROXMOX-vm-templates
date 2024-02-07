@@ -326,7 +326,7 @@ sudo chmod a+x /root/update.sh
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-cat << EOF > /root/update.sh
+doas sh -c 'cat << EOF > /root/update.sh
 #!/bin/sh
 log_file=/var/log/system-update.log
 update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
@@ -341,7 +341,7 @@ echo "Update ended at \${update_date_end}" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
-EOF
+EOF'
 chmod a+x /root/update.sh
 fi
 
@@ -519,6 +519,7 @@ sudo bash -c "cat /dev/null > /var/log/audit/audit.log"
 sudo bash -c "cat /dev/null > /var/log/wtmp"
 sudo logrotate -f /etc/logrotate.conf 
 sudo rm -f /var/log/*-* /var/log/*.gz
+fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
 doas sh -c "cat /dev/null > /var/log/wtmp"
