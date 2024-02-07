@@ -6,7 +6,7 @@ echo "-----------------------------------------------------------------"
 
 # [x] Load common configs from the common scripts
 echo "Load common configs from the common scripts"
-source ../lib/common_vm_scripts.sh
+source lib/common_vm_scripts.sh
 
 # [x] Specific VM template configurations
 # Specific configs
@@ -58,12 +58,13 @@ destroy_old_vm $TEMPLATE_VM_ID
 ### Create new Template
 create_new_template
 
+#############################################################
+### Start the VM template, wait it to start, and then execute the setup script 
+template_os_setup
 
 #############################################################
 echo "----------------------------------------------------------------------------------------"
-echo "Install Debian 12 VM template ..."
-echo "----------------------------------------------------------------------------------------"
-echo "Post-task: login to the ubuntu user, copy the setup file, and run it."
+echo "Done for Debian 12 VM template ..."
 echo "----------------------------------------------------------------------------------------"
 
 
