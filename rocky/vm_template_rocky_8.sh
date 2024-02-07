@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "-----------------------------------------------------------------"
-echo "Create a Linux alpine 3.19 template VM"
+echo "Create a Rocky Linux 8 template VM"
 echo "-----------------------------------------------------------------"
 
 # [x] Load common configs from the common scripts
@@ -10,17 +10,18 @@ source ../lib/common_vm_scripts.sh
 
 # [x] Specific VM template configurations
 # Specific configs
-TEMPLATE_VM_ID=5001
+TEMPLATE_VM_ID=5408
 TEMPLATE_TYPE=template
-TEMPLATE_OS=alpine
-TEMPLATE_VERSION=3.19
-RAM=512
+TEMPLATE_OS=rocky
+TEMPLATE_VERSION=8
+RAM=1024
 CORES=1
-IP=192.168.50.2/24
-DISKIMAGE_SIZE=1 
+IP=192.168.50.48/24
+# RECHECK check the size
+DISKIMAGE_SIZE=4 
 
-IMAGE_URL=https://filedn.com/luEnu9wIDvzholR0Mi4tGLb/linux_images/alpine_3.19_image.raw
-IMAGE_NAME=alpine_3.19_image.raw
+IMAGE_URL=https://dl.rockylinux.org/pub/rocky/8/images/x86_64/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2
+IMAGE_NAME=Rocky-8-GenericCloud-Base.latest.x86_64.qcow2
 IMAGE_PATH=/var/lib/vz/template/cache/$IMAGE_NAME
 
 # [x] Load common VM template configurations
@@ -38,8 +39,8 @@ create_retrive_specific_template_user_password_from_pass $TEMPLATE_VM_ID $DEFAUL
 USER_PASSWORD=$RETURN_VALUE
 
 TEMPLATE_NAME=${TEMPLATE_TYPE}-${TEMPLATE_OS}-${TEMPLATE_VERSION} 
-STORAGE=local-lvm  
-GW=192.168.50.1 
+STORAGE=local-lvm   
+GW=192.168.50.1
 DNS=192.168.50.1
 VLAN=50
 BRIDGE=vmbr1 
@@ -58,24 +59,33 @@ destroy_old_vm $TEMPLATE_VM_ID
 create_new_template
 
 
-
-
 #############################################################
 echo "----------------------------------------------------------------------------------------"
-echo "Install Alpine linux VM template ..."
+echo "Install Rocky Linux 8 VM template ..."
 echo "----------------------------------------------------------------------------------------"
 echo "Post-task: login to the ubuntu user, copy the setup file, and run it."
 echo "----------------------------------------------------------------------------------------"
 
 
-# TODO
+#sudo apt install vim qemu-guest-agent iputils-ping git -y
 
-#doas apk add parted
-#doas parted -s -a opt /dev/sda "print free" "resizepart 3 100%" "print free"
+#cloud-init clean
 
-#pvresize /dev/sda2 # extend the physical volume /dev/sda2
-#pvdisplay # to check
-#lvextend -l +100%FREE  /dev/vg0/lv_root
-#resize2fs /dev/vg0/lv_root
-# ---> in the VM:
+#tasksel --list-tasks
 
+#sudo truncate -s 0 /etc/machine-id
+
+
+#vi /etc/netplan/01-netcfg.yaml
+#network:
+#  version: 2
+#  renderer: networkd
+#  ethernets:
+#    ens18:
+#      dhcp4: no
+#      addresses: [128.204.192.xxx/24]
+#      gateway4: 128.204.192.1
+#      nameservers:
+#        addresses: [89.207.128.252,89.207.130.252]
+#      dhcp6: no```
+#netplan apply

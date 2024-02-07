@@ -1,5 +1,10 @@
 #!/bin/bash
-######################### Ubuntu 24.04 template setup script #############################
+######################### Ubuntu 24.04/22.04 and Debian 11/12 templates setup script #############################
+
+
+
+# https://docs.cloudstack.apache.org/en/4.18.1.0/adminguide/templates/_create_linux.html
+
 
 # [x] F1 - Update the system ..
 # NOTE The code is working and tested on ubuntu linux 24.04 /22.04
@@ -75,9 +80,8 @@ sudo systemctl restart ssh
 # [x] F9 Delete the root password
 # NOTE The code is working and tested on ubuntu linux 24.04 /22.04
 sudo passwd -d root  # to delete the password.
-#passwd -l root  # to lock the user.
-#echo "Update root password ..."
-#sudo pass generate system/root 50
+sudo passwd -l root  # to lock the user.
+#To update a user password from variable:
 #sudo bash -c 'ROOT_PASS=`pass system/root` && echo "root:$ROOT_PASS" | chpasswd'
 
 ## ------------------------------------------------------------------------
@@ -161,37 +165,77 @@ EOF'
 # [x] Last step - Cleaning the system
 # NOTE The code is working and tested on ubuntu linux 24.04 /22.04
 
+########################################
 echo "Cleaning the package system ..."
-sudo rm -rf /config/* /tmp/* /var/lib/apt/lists/* /var/tmp/* 
 sudo apt-get -y clean 
 sudo apt-get -y autoclean 
-sudo apt-get -y autoremove 
+sudo apt-get -y autoremove --purge 
 sudo rm -rf /var/lib/apt/lists/*
 
-# clean shell history
-unset HISTFILE; 
-sudo rm -rf /root/.*history     # remove command history
-sudo find /home -type f  -name '.ash_history' -delete
+########################################
+echo "Remove netplan file(s)"
+sudo rm /etc/netplan/50-cloud-init.yaml
 
-# clean ssh data
-sudo shred -u /etc/ssh/*_key /etc/ssh/*_key.pub   # remove host keys
+########################################
+echo "Cleanup persistent udev rules"
+rm -f /etc/udev/rules.d/70*
+rm -f /var/lib/dhcp/dhclient.* # for redhat based system
+rm -f /var/lib/dhclient/* # for ubuntu based system
+
+########################################
+echo "Clear the machine-id"
+sudo truncate -s0 /etc/machine-id
+sudo rm /var/lib/dbus/machine-id
+sudo ln -s /etc/machine-id /var/lib/dbus/machine-id
+
+########################################
+echo "Run cloud-init clean"
+sudo cloud-init clean
+
+########################################
+echo "Clear Shell History"
+sudo truncate -s0 ~/.bash_history
+sudo history -c
+truncate -s0 ~/.bash_history
+history -c
+
+########################################
+echo "Cleanup /tmp directories"
+rm -rf /tmp/*
+rm -rf /var/tmp/*
+
+########################################
+echo "Cleanup current ssh keys"
+sudo shred -u /etc/ssh/*_key /etc/ssh/*_key.pub /etc/ssh/ssh_host_*   # remove host keys
 sudo rm -f /root/.ssh/authorized_keys
 sudo find /home -type f  -name 'authorized_keys' -delete
 sudo systemctl restart ssh
 
-# clean cloud init data
-sudo cloud-init clean
+########################################
+echo "Reset hostname"
+cat /dev/null > /etc/hostname
 
-sudo su -
-cat /dev/null > /etc/machine-id
-cat /dev/null > /var/lib/dbus/machine-id
-cat /dev/null > /var/lib/dbus/machine-id
+########################################
+echo "Cleanup shell history"
+unset HISTFILE; 
+history -w
+history -c
+sudo history -w
+sudo history -c
+sudo rm -rf /root/.*history
+sudo find /home -type f  -name '.ash_history' -delete 
 
-# stop the system
+########################################
+echo "Cleaning log files"
+cat /dev/null > /var/log/audit/audit.log 2>/dev/null
+cat /dev/null > /var/log/wtmp 2>/dev/null
+logrotate -f /etc/logrotate.conf 2>/dev/null
+rm -f /var/log/*-* /var/log/*.gz 2>/dev/null
+
+
+########################################
+echo "Shutdown the VM"
 sudo shutdown -h now
-
-
-
 
 #-------------------------------------------------------------
 # Extra
@@ -214,4 +258,12 @@ sudo shutdown -h now
 #EOF'
 
 #sudo reboot
+
+# TODO 
+# 1 - recreate the templates
+# 2 - adjust the cleaning for each ubuntu distribution
+# 3 - write a tutorial to be printed after each template creation. This tutorial enumerate steps to update the size of the disk.
+# 4 - write a tutorial to create a swap file and update the swapiness and the cache pressure.
+# 5 - execute this script directly from the vm creation script.
+
 

@@ -94,7 +94,7 @@ rc-service sshd restart
 # [x] F9 Delete the root password
 # NOTE The code is working and tested on alpine linux 3.19 
 passwd -d root  # to delete the password.
-#passwd -l root  # to lock the user.
+passwd -l root  # to lock the user.
 #echo "Update root password ..."
 #sudo pass generate system/root 50
 #sudo bash -c 'ROOT_PASS=`pass system/root` && echo "root:$ROOT_PASS" | chpasswd'
