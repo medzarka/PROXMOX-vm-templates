@@ -149,7 +149,7 @@ if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
 doas apk add iptables
 doas modprobe -v ip_tables 
 doas rc-update add iptables
-doas apk --no-cache add ufw
+doas apk --no-cache add ip6tables ufw
 doas ufw --force enable
 doas ufw default deny incoming
 doas ufw default allow outgoing
