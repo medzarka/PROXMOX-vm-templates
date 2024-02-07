@@ -147,11 +147,10 @@ fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
 doas apk --no-cache add ufw
+doas ufw --force enable
 doas ufw default deny incoming
 doas ufw default allow outgoing
 doas ufw limit SSH  
-#  enabling ufw
-doas ufw --force enable
 doas rc-service ufw restart
 doas rc-update add ufw default
 fi
@@ -342,7 +341,7 @@ echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 EOF'
-chmod a+x /root/update.sh
+doas chmod a+x /root/update.sh
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
@@ -364,7 +363,7 @@ EOF
 chmod a+x /root/update.sh
 fi
 
-echo " --- configure a system update script (that will be executed by proxmox) ..."
+echo " --- configure a backup list (that will be backubed by proxmox) ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
 sudo bash -c 'cat << EOF > /root/backup.list
@@ -452,7 +451,7 @@ sudo cloud-init clean
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-doas cloud-init clean
+doas cloud-init clean >> /dev/null 2>&1
 fi
 
 
