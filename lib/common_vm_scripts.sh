@@ -17,6 +17,7 @@ template_os_setup(){
             sleep 2
         else 
             break
+        fi
     done
     #ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEFAULT_USER@$IP 'sh -s' < os_system_setup.sh
     
