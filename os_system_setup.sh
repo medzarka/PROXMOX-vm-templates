@@ -146,11 +146,91 @@ sudo systemctl restart ufw
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-doas apk --no-cache add firewalld
-doas rc-service firewalld restart
-doas rc-update add firewalld default
-sudo firewall-cmd --permanent --add-service=ssh
-sudo firewall-cmd --reload
+doas apk add ip6tables iptables
+doas apk add -u awall
+doas modprobe -v ip_tables # IPv4
+doas modprobe -v ip6_tables # if IPv6 is used
+
+doas rc-update add iptables
+doas rc-update add ip6tables
+doas rc-service iptables restart
+doas rc-service ip6tables  restart
+
+doas sh -c 'cat << EOF > /etc/awall/optional/cloud-server.json
+{
+  "description": "Default awall policy to protect Cloud server",
+ 
+  "variable": { "internet_if": "eth0" },
+ 
+  "zone": {
+    "internet": { "iface": "$internet_if" }
+  },
+ 
+  "policy": [
+    { "in": "internet", "action": "drop" },
+    { "action": "reject" }
+  ]
+ 
+}
+EOF'
+
+doas sh -c 'cat << EOF >  /etc/awall/optional/ssh.json
+{
+ 
+    "description": "Allow incoming SSH access (TCP/22)",
+ 
+    "filter": [
+        {
+            "in": "internet",
+            "out": "_fw",
+            "service": "ssh",
+            "action": "accept",
+	    "conn-limit": { "count": 3, "interval": 60 }
+        }
+    ]
+}
+EOF'
+
+doas sh -c 'cat << EOF >  /etc/awall/optional/ping.json
+{
+ 
+    "description": "Allow ping-pong",
+ 
+    "filter": [
+        {
+	      "in": "internet",
+	      "service": "ping",
+	      "action": "accept",
+ 	      "flow-limit": { "count": 10, "interval": 6 }
+        }
+    ]
+}
+EOF'
+
+doas sh -c 'cat << EOF >  /etc/awall/optional/outgoing.json
+{
+ 
+    "description": "Allow outgoing connections for dns, http/https, ssh, ntp, ssh and ping",
+ 
+    "filter": [
+    	{
+            "in": "_fw",
+            "out": "internet",
+            "service": [ "dns", "http", "https", "ssh", "ntp", "ping" ],
+            "action": "accept"
+	}
+    ]
+}
+EOF'
+
+doas awall list
+doas awall enable cloud-server
+doas awall enable ssh
+doas awall enable ping
+doas awall enable outgoing
+doas awall activate
+
+
 #doas apk --no-cache add ufw
 #doas ufw --force enable
 #doas ufw default deny incoming
