@@ -140,7 +140,7 @@ sudo ufw limit ssh  # open SSH port and protect against brute-force login attack
 #sudo ufw allow out 443/tcp  # allow outgoing HTTPS traffic
 
 #  enabling ufw
-sudo ufw enable
+sudo ufw --force enable
 sudo systemctl enable ufw 
 sudo systemctl restart ufw 
 fi
@@ -151,7 +151,7 @@ doas ufw default deny incoming
 doas ufw default allow outgoing
 doas ufw limit SSH  
 #  enabling ufw
-doas ufw enable
+doas ufw --force enable
 doas rc-service ufw restart
 doas rc-update add ufw default
 fi
