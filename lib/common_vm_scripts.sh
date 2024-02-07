@@ -11,13 +11,13 @@ template_os_setup(){
 
     echo "  waiting the system to be fully loaded and the port 22 is open."
     while true; do
-        nc -z -v -w5 $IP 22
+        nc -z -v -w60 $IP 22
         result=$?
-        if [  "$result1" != 0 ]; then
+        if [  "$result" != 0 ]; then
             echo "     still waiting"
-            sleep 3
+            sleep 4
         else
-            breaks
+            break
         fi
     done
 
