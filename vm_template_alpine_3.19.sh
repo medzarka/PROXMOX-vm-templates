@@ -6,7 +6,7 @@ echo "-----------------------------------------------------------------"
 
 # [x] Load common configs from the common scripts
 echo "Load common configs from the common scripts"
-source ../lib/common_vm_scripts.sh
+source lib/common_vm_scripts.sh
 
 # [x] Specific VM template configurations
 # Specific configs
@@ -56,6 +56,12 @@ destroy_old_vm $TEMPLATE_VM_ID
 #############################################################
 ### Create new Template
 create_new_template
+
+#############################################################
+### Start the VM template, wait it to start, and then execute the setup script 
+sudo qm start $TEMPLATE_VM_ID
+sleep 20
+ssh $DEFAULT_USER@$IP 'sh -s' < os_system_steup.sh
 
 
 

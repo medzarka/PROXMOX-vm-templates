@@ -89,3 +89,5 @@ echo "--------------------------------------------------------------------------
 #        addresses: [89.207.128.252,89.207.130.252]
 #      dhcp6: no```
 #netplan apply
+
+# ssh root@MachineB 'bash -s' < local_script.sh

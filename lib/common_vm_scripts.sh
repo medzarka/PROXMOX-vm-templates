@@ -30,7 +30,7 @@ create_new_template(){
     #sudo qm set $TEMPLATE_VM_ID --ipconfig0 ip=dhcp,ip6=auto 
     sudo qm set $TEMPLATE_VM_ID --nameserver $DNS 
     sudo qm set $TEMPLATE_VM_ID --searchdomain $MAIN_DOMAIN 
-    sudo qm start $TEMPLATE_VM_ID 
+     
 }
 
 

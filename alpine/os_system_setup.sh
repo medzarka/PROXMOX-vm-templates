@@ -5,8 +5,8 @@
 # NOTE The code is working and tested on alpine linux 3.19 
 echo "------------------------------------------------------------------------"
 echo "Configure the alpine repositories and update the system ..."
-sed -i 's/#http/http/g' /etc/apk/repositories # enable community repository
-apk update
+doas sed -i 's/#http/http/g' /etc/apk/repositories # enable community repository
+doas apk update
 apk upgrade --no-cache --available
 
 # [x] F2 Install required softwares
@@ -129,9 +129,7 @@ sed -Ei \
 /sbin/extlinux --install /boot
 /sbin/update-extlinux --warn-only
 
-# Disable getty for physical ttys, enable getty for serial ttyS0.
-# but we could not connect to terminal after it ????
-#sed -Ei -e '/^tty[0-9]/s/^/#/' -e '/^#ttyS0:/s/^#//' "/etc/inittab"
+
 
 ## ------------------------------------------------------------------------
 # [ ] F12 - configure update sceript and backup's folders list
