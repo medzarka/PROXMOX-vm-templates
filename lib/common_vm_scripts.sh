@@ -3,10 +3,24 @@
 # NOTE - Template scripts
 
 template_os_setup(){
+    echo "-----------------------------------------------------------------"
+    echo "Configuring the template OS system ..."
+
+    echo "   start the template"
     sudo qm start $TEMPLATE_VM_ID
-    sleep 30
-    ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null  $DEFAULT_USER@$IP 'sh -s' < os_system_setup.sh
+    
+    echo "   execute the script on the template"
+    while true; do
+    RESULT=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEFAULT_USER@$IP 'sh -s' < os_system_setup.sh)
+    [ -z $RESULT] || break
+    done
+    #ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEFAULT_USER@$IP 'sh -s' < os_system_setup.sh
+    
+    echo "   shutdown the template"
     sudo qm stop $TEMPLATE_VM_ID
+
+    tttt=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null abc@192.168.50.2 'sh -s' < os_system_setup.sh)
+
 }
 
 create_new_template(){
