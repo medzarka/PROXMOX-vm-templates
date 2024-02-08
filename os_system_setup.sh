@@ -412,7 +412,7 @@ fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
 #doas sh -c 'cat << EOF > /root/backup.list # RECHECK do not work on Alpine, inexistant file
-sudo tee /root/backup.list <<EOF
+doas tee /root/backup.list <<EOF
 CONFIGS /etc 
 ROOT    /root
 LOGS    /var/log
