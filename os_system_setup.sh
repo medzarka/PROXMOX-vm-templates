@@ -17,7 +17,7 @@ LINUX_DISTRIBUTION_VERSION=$(cat /etc/*-release | grep VERSION_ID | head -n1 | c
 # SEE NOTES -----------------------------------------------------------------------
 
 
-# [x] F0 - System identification and disk size expand ..
+# [x] F0 - System identification and disk size expand ... 
 echo ""
 echo "------------------------------------------------------------------------"
 echo "System identification ..."
