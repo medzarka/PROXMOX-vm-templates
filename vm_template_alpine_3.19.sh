@@ -72,10 +72,12 @@ echo "--------------------------------------------------------------------------
 
 #doas apk add parted
 #doas parted -s -a opt /dev/sda "print free" "resizepart 3 100%" "print free"
+#resize2fs /dev/vg0/lv_root
+
 
 #pvresize /dev/sda2 # extend the physical volume /dev/sda2
 #pvdisplay # to check
 #lvextend -l +100%FREE  /dev/vg0/lv_root
 #resize2fs /dev/vg0/lv_root
-# ---> in the VM:
+
 

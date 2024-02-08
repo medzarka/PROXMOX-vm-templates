@@ -6,11 +6,11 @@ LINUX_DISTRIBUTION_VERSION=$(cat /etc/*-release | grep VERSION_ID | head -n1 | c
 
 # SEE NOTES -----------------------------------------------------------------------
 # POST Check of the templates
-# [ ] Check Ubuntu 24.04
-# [ ] Check Ubuntu 22.04
-# [ ] Check Debian 12
-# [ ] Check Ubuntu 11
-# [ ] Check Alpine 3.19
+# [x] Check Ubuntu 24.04 [disk size: 3584M | sda1 / (last) - 2.4G | sda16 /boot 881M | sda15 /boot/efi 105M | FREE SPACE AFTER UPDATE 984M | RAM: 166M]
+# [x] Check Ubuntu 22.04 [disk size: 2252M | sda1 / (last) - 2G   | sda15 /boot/efi 105M | FREE SPACE AFTER UPDATE 50M WITH ERROR | RAM: 169M]
+# [ ] Check Debian 12 [disk size: 2G | sda1 / (last) - 1.9G | sda15 /boot/efi 130M | FREE SPACE AFTER UPDATE 540M | RAM: 110M]
+# [ ] Check Ubuntu 11 [disk size: 2G | sda1 / (last) - 1.9G | sda15 /boot/efi 130M | FREE SPACE AFTER UPDATE 651M | RAM: 65M]
+# [x] Check Alpine 3.19 [disk size: 1G | sda3 / (last) - 427M | sda1 /boot 271M | FREE SPACE AFTER UPDATE 248M | RAM: 45M]
 # [ ] Check Rocky 9
 # [ ] Check Rocky 8
 
@@ -28,7 +28,7 @@ echo "Linux distribution version  --> $LINUX_DISTRIBUTION_VERSION"
 echo ""
 echo "------------------------------------------------------------------------"
 echo "Update the system ..."
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then # BUG 24.04/22.04/12 --> sudo: export: command not found
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
 sudo bash -c "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"
 sudo apt-get update
 sudo apt-get upgrade -y --no-install-recommends
@@ -148,7 +148,7 @@ echo "------------------------------------------------------------------------"
 echo "Configure the firewall (only ssh port is accessible) ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
-sudo apt-get install --no-install-recommends ufw -y
+sudo apt-get install --no-install-recommends ufw -y  # BUG install and config issue with debian 11
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw limit ssh  # open SSH port and protect against brute-force login attacks
@@ -292,7 +292,7 @@ echo "System Tweak ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
 echo " --- disabling lxd-agent service ..."
-if [ "$LINUX_DISTRIBUTION" = "Debian" ];then 
+if [ "$LINUX_DISTRIBUTION" = "Debian" ]; then 
 sudo systemctl disable lxd-agent
 fi
 echo " --- disabling systemd-networkd-wait-online.service ..."
@@ -323,37 +323,38 @@ fi
 echo ""
 echo "------------------------------------------------------------------------"
 echo "Configure an update script and backup's folders list ..."
-# INCOMPLETE 
 # The main idea behind this step is to allow the PVE01 system to update and backup the VM.
 # Thus, we create an update script in /root/update.sh to update the VM system.
 # Then, we create a backup's folders list to make a backup for specific folders.
 
 echo " --- configure a system update script (that will be executed by proxmox) ..."
 
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
-sudo bash -c 'cat << EOF > /root/update.sh
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then # BUG do not work on debian 11 and 12
+#sudo bash -c 'cat << EOF > /root/update.sh  
+sudo tee /root/update.sh <<EOF
 #!/bin/bash
 log_file=/var/log/system-update.log
 update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
 echo "------------------------------------" >> \$log_file 2>&1
 echo "Start system update at \${update_date_start}" >> \$log_file 2>&1
+sudo bash -c "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"
 sudo apt-get update >> \$log_file 2>&1
-sudo apt upgrade -y --no-install-recommends >> \$log_file 2>&1
-sudo apt autoremove -y --purge >> \$log_file 2>&1
+sudo apt-get -y upgrade --no-install-recommends >> \$log_file 2>&1
+sudo apt-get -y autoremove --purge >> \$log_file 2>&1
 sudo apt-get -y clean >> \$log_file 2>&1
 sudo apt-get -y autoclean  >> \$log_file 2>&1
-sudo apt-get -y autoremove -purge >> \$log_file 2>&1 
+sudo apt-get -y autoremove --purge >> \$log_file 2>&1 
 update_date_end=\$(date +'%m-%d-%Y--%H:%M:%S')
 echo "Update ended at \${update_date_end}" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
-EOF'
+EOF
 sudo chmod a+x /root/update.sh
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-doas sh -c 'cat << EOF > /root/update.sh
+doas sh -c 'cat << EOF > /root/update.sh # BUG do not work on Alpine, inexistant file
 #!/bin/sh
 log_file=/var/log/system-update.log
 update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
@@ -394,7 +395,7 @@ fi
 echo " --- configure a backup list (that will be backuped by proxmox) ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-sudo bash -c 'cat << EOF > /root/backup.list
+sudo bash -c 'cat << EOF > /root/backup.list # BUG do not work on debian 11
 CONFIGS /etc
 ROOT    /root
 LOGS    /var/log
@@ -402,8 +403,8 @@ EOF'
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-doas sh -c 'cat << EOF > /root/backup.list
-CONFIGS /etc
+doas sh -c 'cat << EOF > /root/backup.list # BUG do not work on Alpine, inexistant file
+CONFIGS /etc 
 ROOT    /root
 LOGS    /var/log
 EOF'
@@ -542,16 +543,16 @@ fi
 echo " --- Cleaning log files"
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-
-sudo bash -c "cat /dev/null > /var/log/audit/audit.log" # BUG 24.04/22.04/12/11 --> No such file or directory
+sudo mkdir -p /var/log/audit/
+sudo rm -rf /var/log/audit/audit.log
+sudo touch /var/log/audit/audit.log
 sudo bash -c "cat /dev/null > /var/log/wtmp"
-sudo logrotate -f /etc/logrotate.conf   # BUG 12 --> logrotate: command not found
-sudo rm -rf /var/log/*-* /var/log/*.gz  # BUG 24.04/22.04/12/11/Rocky9/8 --> /var/log/dist-upgrade is a directory (same for /var/log/unattended-upgrades) (for rocky rm: cannot remove '/var/log/qemu-ga': Is a directory)
+sudo rm -rf /var/log/*-* /var/log/*.gz  
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
 doas sh -c "cat /dev/null > /var/log/wtmp"
-doas rm -f /var/log/*-* /var/log/*.gz
+doas rm -rf /var/log/*-* /var/log/*.gz
 fi
 
 ########################################
