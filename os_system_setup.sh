@@ -25,27 +25,27 @@ echo "Detected Linux distribution --> $LINUX_DISTRIBUTION"
 echo "Linux distribution version  --> $LINUX_DISTRIBUTION_VERSION"
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] && [ "$LINUX_DISTRIBUTION_VERSION" = "24.04" ]; then
-sudo parted -s -a opt /dev/sda "print free" "resizepart 4 100%" "print free"
+sudo parted -s -a opt /dev/sda "print free" "resizepart 4 yes 100%" "print free"
 sudo resize2fs /dev/sda1
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] && [ "$LINUX_DISTRIBUTION_VERSION" = "22.04" ]; then
-sudo parted -s -a opt /dev/sda "print free" "resizepart 3 100%" "print free"
+sudo parted -s -a opt /dev/sda "print free" "resizepart 3 yes 100%" "print free"
 sudo resize2fs /dev/sda1
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
-sudo parted -s -a opt /dev/sda "print free" "resizepart 3 100%" "print free"
+sudo parted -s -a opt /dev/sda "print free" "resizepart 3 yes 100%" "print free"
 sudo resize2fs /dev/sda1
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-doas parted -s -a opt /dev/sda "print free" "resizepart 3 100%" "print free"
+doas parted -s -a opt /dev/sda "print free" "resizepart 3 yes 100%" "print free"
 doas resize2fs /dev/sda3
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-doas parted -s -a opt /dev/sda "print free" "resizepart 5 100%" "print free"
+doas parted -s -a opt /dev/sda "print free" "resizepart 5 yes 100%" "print free"
 doas resize2fs /dev/sda5
 fi
 
