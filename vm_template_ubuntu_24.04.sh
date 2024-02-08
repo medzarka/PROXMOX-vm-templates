@@ -70,6 +70,8 @@ echo "--------------------------------------------------------------------------
 
 
 
+
+
 #sudo apt install vim qemu-guest-agent iputils-ping git -y
 
 #cloud-init clean

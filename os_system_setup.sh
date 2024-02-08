@@ -4,6 +4,19 @@
 LINUX_DISTRIBUTION=$(cat /etc/os-release | grep "PRETTY_NAME" | sed 's/PRETTY_NAME=//g' | sed 's/["]//g' | awk '{print $1}')
 LINUX_DISTRIBUTION_VERSION=$(cat /etc/*-release | grep VERSION_ID | head -n1 | cut -d '=' -f2 | cut -d '"' -f2)
 
+# SEE NOTES -----------------------------------------------------------------------
+# POST Check of the templates
+# [ ] Check Ubuntu 24.04
+# [ ] Check Ubuntu 22.04
+# [ ] Check Debian 12
+# [ ] Check Ubuntu 11
+# [ ] Check Alpine 3.19
+# [ ] Check Rocky 9
+# [ ] Check Rocky 8
+
+# SEE NOTES -----------------------------------------------------------------------
+
+
 # [x] F0 - System identification ..
 echo ""
 echo "------------------------------------------------------------------------"
@@ -16,9 +29,10 @@ echo ""
 echo "------------------------------------------------------------------------"
 echo "Update the system ..."
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
-sudo apt update
-sudo apt upgrade -y --no-install-recommends
-sudo apt autoremove -y --purge
+sudo -E export DEBIAN_FRONTEND="noninteractive"
+sudo apt-get update
+sudo apt-get upgrade -y --no-install-recommends
+sudo apt-get autoremove -y --purge
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
