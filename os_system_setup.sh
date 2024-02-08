@@ -24,12 +24,12 @@ echo "System identification ..."
 echo "Detected Linux distribution --> $LINUX_DISTRIBUTION"
 echo "Linux distribution version  --> $LINUX_DISTRIBUTION_VERSION"
 
-# [x] F1 - Update the system ..
+# [x] F1 - Update the system ...
 echo ""
 echo "------------------------------------------------------------------------"
 echo "Update the system ..."
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
-sudo -E export DEBIAN_FRONTEND="noninteractive"
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then # BUG 24.04/22.04/12 --> sudo: export: command not found
+sudo bash -c "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"
 sudo apt-get update
 sudo apt-get upgrade -y --no-install-recommends
 sudo apt-get autoremove -y --purge
@@ -52,7 +52,7 @@ echo "------------------------------------------------------------------------"
 echo "Install required softwares..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
-sudo apt install --no-install-recommends neofetch htop chrony tzdata nano parted wget -y
+sudo apt-get install --no-install-recommends neofetch htop chrony tzdata nano parted wget -y
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
@@ -86,7 +86,7 @@ echo "------------------------------------------------------------------------"
 echo "Install KVM guest agent (QEMU) ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
-sudo apt install --no-install-recommends qemu-guest-agent -y
+sudo apt-get install --no-install-recommends qemu-guest-agent -y
 sudo systemctl enable qemu-guest-agent
 sudo systemctl start qemu-guest-agent
 fi
@@ -115,6 +115,8 @@ doas chmod -x /etc/modules-load.d/isofs.conf
 doas setup-cloud-init
 doas sh -c "echo 'datasource_list: [ NoCloud, ConfigDrive, None ]' > /etc/cloud/cloud.cfg.d/99_pve.cfg"
 doas chmod 644 /etc/cloud/cloud.cfg.d/99_pve.cfg
+else
+echo "  --- Cloud-init is already installed and configured for Ubuntu/Debian/Rocky distributions"
 fi
 
 # [x] F6 configure sudo/doas
@@ -135,15 +137,18 @@ doas sh -c "echo 'permit nopass keepenv root as root' >> /etc/doas.d/wheel.conf"
 # for sudo --> echo '%wheel ALL=(ALL) ALL' > "/etc/sudoers.d/wheel"
 #echo 'permit persist :wheel' > "/etc/doas.d/wheel.conf"
 #echo 'permit nopass keepenv root as root' >> "/etc/doas.d/wheel.conf"
+echo "  --- doas permit is installed and configured for Alpine distribution"
+else
+echo "  --- sudo permit is already installed and configured for Ubuntu/Debian/Rocky distributions"
 fi
 
 # [x] F7 Configure the firewall
 echo ""
 echo "------------------------------------------------------------------------"
-echo "Configure the firewall (22 only is accessible) ..."
+echo "Configure the firewall (only ssh port is accessible) ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
-sudo apt install --no-install-recommends ufw -y
+sudo apt-get install --no-install-recommends ufw -y
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw limit ssh  # open SSH port and protect against brute-force login attacks
@@ -169,7 +174,7 @@ doas rc-service ufw restart
 doas rc-update add ufw default
 fi
 
-if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then # BUG ERROR:dbus.proxies:Introspect error on :1.47:/org/fedoraproject/FirewallD1: dbus.exceptions.DBusException: org.freedesktop.DBus.Error.NoReply: Did not receive a reply. Possible causes include: the remote application did not send a reply, the message bus security policy blocked the reply, the reply timeout expired, or the network connection was broken.
 sudo dnf install firewalld -y
 sudo systemctl enable firewalld
 sudo systemctl start firewalld
@@ -215,6 +220,7 @@ sudo sed -r -i 's/^#?PermitRootLogin.*/PermitRootLogin no/g' /etc/ssh/sshd_confi
 sudo sed -r -i 's/^#?PasswordAuthentication.*/PasswordAuthentication no/g' /etc/ssh/sshd_config # Do not allow password authentication.
 sudo systemctl restart sshd
 fi
+echo " --- /etc/ssh/sshd_config file is updated"
 
 # [x] F9 Delete the root password
 echo ""
@@ -249,24 +255,29 @@ net.ipv6.conf.lo.disable_ipv6 = 1
 net.ipv6.conf.eth0.disable_ipv6 = 1
 EOF'
 sudo sysctl -p /etc/sysctl.d/99-disable-ipv6.conf # to apply the modifications for the given file only
+echo " --- /etc/sysctl.d/99-disable-ipv6.conf file is created and applied"
 # reboot to apply modifications
 # COMMENT The system will reload again the IPv6 after each reboot.
 # COMMENT Then, We can solve the IPV6 issue by calling the following script hourly
+sudo mkdir -p /etc/cron.hourly
 sudo bash -c 'cat <<EOF > /etc/cron.hourly/disable-ipv6
 #!/bin/bash
 sudo sysctl -p /etc/sysctl.d/99-disable-ipv6.conf
 EOF'
 sudo chmod +x /etc/cron.hourly/disable-ipv6
 sudo run-parts --test /etc/cron.hourly # to check
+echo " --- /etc/cron.hourly/disable-ipv6 hourly file is created"
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
+
 doas sh -c "echo '# Disable IPV6 (Comment the three following lines to get IPV6 back)' > /etc/sysctl.d/99-disable-ipv6.conf"
 doas sh -c "echo 'net.ipv6.conf.all.disable_ipv6 = 1' >> /etc/sysctl.d/99-disable-ipv6.conf"
 doas sh -c "echo 'net.ipv6.conf.default.disable_ipv6 = 1' >> /etc/sysctl.d/99-disable-ipv6.conf"
 doas sh -c "echo 'net.ipv6.conf.lo.disable_ipv6 = 1' >> /etc/sysctl.d/99-disable-ipv6.conf"
 doas sh -c "echo 'net.ipv6.conf.eth0.disable_ipv6 = 1' >> /etc/sysctl.d/99-disable-ipv6.conf"
 doas sysctl -p /etc/sysctl.d/99-disable-ipv6.conf # to apply the modifications for the given file only
+echo " --- /etc/sysctl.d/99-disable-ipv6.conf file is created and applied"
 fi
 
 # Only for Ubuntu and debian 12 ---------
@@ -280,8 +291,11 @@ echo "------------------------------------------------------------------------"
 echo "System Tweak ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
-echo " --- Avoid Network wait ..."
+echo " --- disabling lxd-agent service ..."
+if [ "$LINUX_DISTRIBUTION" = "Debian" ];then 
 sudo systemctl disable lxd-agent
+fi
+echo " --- disabling systemd-networkd-wait-online.service ..."
 sudo systemctl disable systemd-networkd-wait-online.service
 sudo systemctl mask systemd-networkd-wait-online.service
 fi
@@ -359,7 +373,7 @@ doas chmod a+x /root/update.sh
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-cat << EOF > /root/update.sh
+sudo bash -c 'cat << EOF > /root/update.sh
 #!/bin/sh
 log_file=/var/log/system-update.log
 update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
@@ -373,11 +387,11 @@ echo "Update ended at \${update_date_end}" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
-EOF
-chmod a+x /root/update.sh
+EOF'
+sudo chmod a+x /root/update.sh
 fi
 
-echo " --- configure a backup list (that will be backubed by proxmox) ..."
+echo " --- configure a backup list (that will be backuped by proxmox) ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
 sudo bash -c 'cat << EOF > /root/backup.list
@@ -412,7 +426,7 @@ fi
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
 doas apk -v cache clean
 doas apk -v cache purge
-doas m /var/cache/apk/*
+doas rm /var/cache/apk/*
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
@@ -425,7 +439,7 @@ fi
 ########################################
 echo " --- Remove netplan file(s)"
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
-sudo rm /etc/netplan/50-cloud-init.yaml
+sudo rm -f /etc/netplan/50-cloud-init.yaml
 fi
 
 ########################################
@@ -528,10 +542,11 @@ fi
 echo " --- Cleaning log files"
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-sudo bash -c "cat /dev/null > /var/log/audit/audit.log"
+
+sudo bash -c "cat /dev/null > /var/log/audit/audit.log" # BUG 24.04/22.04/12/11 --> No such file or directory
 sudo bash -c "cat /dev/null > /var/log/wtmp"
-sudo logrotate -f /etc/logrotate.conf 
-sudo rm -f /var/log/*-* /var/log/*.gz
+sudo logrotate -f /etc/logrotate.conf   # BUG 12 --> logrotate: command not found
+sudo rm -rf /var/log/*-* /var/log/*.gz  # BUG 24.04/22.04/12/11/Rocky9/8 --> /var/log/dist-upgrade is a directory (same for /var/log/unattended-upgrades) (for rocky rm: cannot remove '/var/log/qemu-ga': Is a directory)
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
@@ -573,11 +588,8 @@ fi
 #sudo reboot
 
 # TODO 
-# 1 - recreate the templates
-# 2 - adjust the cleaning for each ubuntu distribution
-# 3 - write a tutorial to be printed after each template creation. This tutorial enumerate steps to update the size of the disk.
-# 4 - write a tutorial to create a swap file and update the swapiness and the cache pressure.
-# 5 - execute this script directly from the vm creation script. ssh root@MachineB 'bash -s' < local_script.sh
+# [ ] - write a tutorial to be printed after each template creation. This tutorial enumerate steps to update the size of the disk.
+# [ ] - write a tutorial to create a swap file and update the swapiness and the cache pressure.
 
 
 
