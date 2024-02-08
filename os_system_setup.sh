@@ -247,35 +247,38 @@ echo "------------------------------------------------------------------------"
 echo "Diable IPV6 ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-sudo bash -c 'cat << EOF > /etc/sysctl.d/99-disable-ipv6.conf
+#sudo bash -c 'cat << EOF > /etc/sysctl.d/99-disable-ipv6.conf
+sudo tee /etc/sysctl.d/99-disable-ipv6.conf <<EOF
 # Diable IPV6 (Comment the three following lines to get IPV6 back)
 net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
 net.ipv6.conf.lo.disable_ipv6 = 1
 net.ipv6.conf.eth0.disable_ipv6 = 1
-EOF'
+EOF
 sudo sysctl -p /etc/sysctl.d/99-disable-ipv6.conf # to apply the modifications for the given file only
 echo " --- /etc/sysctl.d/99-disable-ipv6.conf file is created and applied"
 # reboot to apply modifications
 # COMMENT The system will reload again the IPv6 after each reboot.
 # COMMENT Then, We can solve the IPV6 issue by calling the following script hourly
 sudo mkdir -p /etc/cron.hourly
-sudo bash -c 'cat <<EOF > /etc/cron.hourly/disable-ipv6
+#sudo bash -c 'cat <<EOF > /etc/cron.hourly/disable-ipv6
+sudo tee /etc/cron.hourly/disable-ipv6 <<EOF
 #!/bin/bash
 sudo sysctl -p /etc/sysctl.d/99-disable-ipv6.conf
-EOF'
+EOF
 sudo chmod +x /etc/cron.hourly/disable-ipv6
 sudo run-parts --test /etc/cron.hourly # to check
 echo " --- /etc/cron.hourly/disable-ipv6 hourly file is created"
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-
-doas sh -c "echo '# Disable IPV6 (Comment the three following lines to get IPV6 back)' > /etc/sysctl.d/99-disable-ipv6.conf"
-doas sh -c "echo 'net.ipv6.conf.all.disable_ipv6 = 1' >> /etc/sysctl.d/99-disable-ipv6.conf"
-doas sh -c "echo 'net.ipv6.conf.default.disable_ipv6 = 1' >> /etc/sysctl.d/99-disable-ipv6.conf"
-doas sh -c "echo 'net.ipv6.conf.lo.disable_ipv6 = 1' >> /etc/sysctl.d/99-disable-ipv6.conf"
-doas sh -c "echo 'net.ipv6.conf.eth0.disable_ipv6 = 1' >> /etc/sysctl.d/99-disable-ipv6.conf"
+doas tee /etc/sysctl.d/99-disable-ipv6.conf <<EOF
+# Diable IPV6 (Comment the three following lines to get IPV6 back)
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv6.conf.eth0.disable_ipv6 = 1
+EOF
 doas sysctl -p /etc/sysctl.d/99-disable-ipv6.conf # to apply the modifications for the given file only
 echo " --- /etc/sysctl.d/99-disable-ipv6.conf file is created and applied"
 fi
@@ -329,8 +332,8 @@ echo "Configure an update script and backup's folders list ..."
 
 echo " --- configure a system update script (that will be executed by proxmox) ..."
 
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then # BUG do not work on debian 11 and 12
-#sudo bash -c 'cat << EOF > /root/update.sh  
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then 
+#sudo bash -c 'cat << EOF > /root/update.sh   # RECHECK do not work on debian 11 and 12
 sudo tee /root/update.sh <<EOF
 #!/bin/bash
 log_file=/var/log/system-update.log
@@ -354,7 +357,7 @@ sudo chmod a+x /root/update.sh
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-doas sh -c 'cat << EOF > /root/update.sh # BUG do not work on Alpine, inexistant file
+doas tee /root/update.sh <<EOF # RECHECK do not work on Alpine, inexistant file
 #!/bin/sh
 log_file=/var/log/system-update.log
 update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
@@ -369,12 +372,12 @@ echo "Update ended at \${update_date_end}" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
-EOF'
+EOF
 doas chmod a+x /root/update.sh
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-sudo bash -c 'cat << EOF > /root/update.sh
+sudo tee /root/update.sh <<EOF
 #!/bin/sh
 log_file=/var/log/system-update.log
 update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
@@ -388,26 +391,28 @@ echo "Update ended at \${update_date_end}" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
-EOF'
+EOF
 sudo chmod a+x /root/update.sh
 fi
 
 echo " --- configure a backup list (that will be backuped by proxmox) ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-sudo bash -c 'cat << EOF > /root/backup.list # BUG do not work on debian 11
+#sudo bash -c 'cat << EOF > /root/backup.list # RECHECK do not work on debian 11
+sudo tee /root/backup.list <<EOF
 CONFIGS /etc
 ROOT    /root
 LOGS    /var/log
-EOF'
+EOF
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-doas sh -c 'cat << EOF > /root/backup.list # BUG do not work on Alpine, inexistant file
+#doas sh -c 'cat << EOF > /root/backup.list # RECHECK do not work on Alpine, inexistant file
+sudo tee /root/backup.list <<EOF
 CONFIGS /etc 
 ROOT    /root
 LOGS    /var/log
-EOF'
+EOF
 fi
 
 # [x] Last step - Cleaning the system
@@ -435,28 +440,25 @@ sudo dnf -y autoremove
 sudo dnf -y clean all  --enablerepo=\*;
 fi
 
-
+########################################
+#echo " --- Remove netplan file(s)"
+#if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
+#sudo rm -f /etc/netplan/50-cloud-init.yaml
+#fi
 
 ########################################
-echo " --- Remove netplan file(s)"
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
-sudo rm -f /etc/netplan/50-cloud-init.yaml
-fi
+#echo " --- Cleanup persistent udev rules"
+#if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+#sudo rm -rf /etc/udev/rules.d/70*
+#sudo rm -rf /var/lib/dhclient/* # for ubuntu based system
+#sudo rm -rf /var/lib/dhcp/dhclient.* # for redhat based system
+#fi
 
-########################################
-echo " --- Cleanup persistent udev rules"
-
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-sudo rm -rf /etc/udev/rules.d/70*
-sudo rm -rf /var/lib/dhclient/* # for ubuntu based system
-sudo rm -rf /var/lib/dhcp/dhclient.* # for redhat based system
-fi
-
-if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-doas rm -rf /etc/udev/rules.d/70*
-doas rm -rf /var/lib/dhcp/dhclient.* # for redhat based system
-doas rm -rf /var/lib/dhclient/* # for ubuntu based system
-fi
+#if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
+#doas rm -rf /etc/udev/rules.d/70*
+#doas rm -rf /var/lib/dhcp/dhclient.* # for redhat based system
+#doas rm -rf /var/lib/dhclient/* # for ubuntu based system
+#fi
 
 ########################################
 echo " --- Clear the machine-id"
@@ -464,7 +466,6 @@ echo " --- Clear the machine-id"
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
 sudo truncate -s0 /etc/machine-id
 sudo rm -f /var/lib/dbus/machine-id
-#sudo ln -s /etc/machine-id /var/lib/dbus/machine-id
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
@@ -543,16 +544,11 @@ fi
 echo " --- Cleaning log files"
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-sudo mkdir -p /var/log/audit/
-sudo rm -rf /var/log/audit/audit.log
-sudo touch /var/log/audit/audit.log
-sudo bash -c "cat /dev/null > /var/log/wtmp"
-sudo rm -rf /var/log/*-* /var/log/*.gz  
+sudo rm -rf /var/log/**
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-doas sh -c "cat /dev/null > /var/log/wtmp"
-doas rm -rf /var/log/*-* /var/log/*.gz
+doas rm -rf /var/log/**
 fi
 
 ########################################
