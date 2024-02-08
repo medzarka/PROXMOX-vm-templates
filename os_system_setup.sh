@@ -6,7 +6,7 @@ LINUX_DISTRIBUTION_VERSION=$(cat /etc/*-release | grep VERSION_ID | head -n1 | c
 
 # SEE NOTES -----------------------------------------------------------------------
 # POST Check of the templates
-# [x] Check Ubuntu 24.04 [disk size: 3584M | sda1 / (last) - 2.4G | sda16 /boot 881M | sda15 /boot/efi 105M | FREE SPACE AFTER UPDATE 984M | RAM: 166M]
+# [x] Check Ubuntu 24.04 [disk size: 3584M | sda1 / (last) - 2.4G | sda16 /boot 881M | sda15 /boot/efi 105M | FREE SPACE AFTER UPDATE 984M | RAM: 166M] TEMPLATE OK
 # [x] Check Ubuntu 22.04 [disk size: 2252M | sda1 / (last) - 2G   | sda15 /boot/efi 105M | FREE SPACE AFTER UPDATE 50M WITH ERROR | RAM: 169M]
 # [ ] Check Debian 12 [disk size: 2G | sda1 / (last) - 1.9G | sda15 /boot/efi 130M | FREE SPACE AFTER UPDATE 540M | RAM: 110M]
 # [ ] Check Ubuntu 11 [disk size: 2G | sda1 / (last) - 1.9G | sda15 /boot/efi 130M | FREE SPACE AFTER UPDATE 651M | RAM: 65M]
@@ -17,12 +17,37 @@ LINUX_DISTRIBUTION_VERSION=$(cat /etc/*-release | grep VERSION_ID | head -n1 | c
 # SEE NOTES -----------------------------------------------------------------------
 
 
-# [x] F0 - System identification ..
+# [x] F0 - System identification and disk size expand ..
 echo ""
 echo "------------------------------------------------------------------------"
 echo "System identification ..."
 echo "Detected Linux distribution --> $LINUX_DISTRIBUTION"
 echo "Linux distribution version  --> $LINUX_DISTRIBUTION_VERSION"
+
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] && [ "$LINUX_DISTRIBUTION_VERSION" = "24.04" ]; then
+sudo parted -s -a opt /dev/sda "print free" "resizepart 4 100%" "print free"
+sudo resize2fs /dev/sda1
+fi
+
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] && [ "$LINUX_DISTRIBUTION_VERSION" = "22.04" ]; then
+sudo parted -s -a opt /dev/sda "print free" "resizepart 3 100%" "print free"
+sudo resize2fs /dev/sda1
+fi
+
+if [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
+sudo parted -s -a opt /dev/sda "print free" "resizepart 3 100%" "print free"
+sudo resize2fs /dev/sda1
+fi
+
+if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
+doas parted -s -a opt /dev/sda "print free" "resizepart 3 100%" "print free"
+doas resize2fs /dev/sda3
+fi
+
+if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+doas parted -s -a opt /dev/sda "print free" "resizepart 5 100%" "print free"
+doas resize2fs /dev/sda5
+fi
 
 # [x] F1 - Update the system ...
 echo ""
@@ -32,7 +57,6 @@ if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ];
 echo "debconf debconf/frontend select noninteractive" | sudo debconf-set-selections
 sudo apt-get update
 sudo apt-get upgrade -y --no-install-recommends
-sudo apt-get autoremove -y --purge
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
@@ -296,11 +320,12 @@ echo ""
 echo "------------------------------------------------------------------------"
 echo "System Tweak ..."
 
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ]; then 
 echo " --- disabling lxd-agent service ..."
-if [ "$LINUX_DISTRIBUTION" = "Debian" ]; then 
 sudo systemctl disable lxd-agent
 fi
+
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
 echo " --- disabling systemd-networkd-wait-online.service ..."
 sudo systemctl disable systemd-networkd-wait-online.service
 sudo systemctl mask systemd-networkd-wait-online.service
@@ -590,7 +615,6 @@ fi
 #sudo reboot
 
 # TODO 
-# [ ] - write a tutorial to be printed after each template creation. This tutorial enumerate steps to update the size of the disk.
 # [ ] - write a tutorial to create a swap file and update the swapiness and the cache pressure.
 
 

@@ -58,6 +58,12 @@ create_new_template(){
     sudo qm set $TEMPLATE_VM_ID --nameserver $DNS 
     sudo qm set $TEMPLATE_VM_ID --searchdomain $MAIN_DOMAIN 
     sudo qm set $TEMPLATE_VM_ID --ciupgrade 0
+    if [[ $DISKIMAGE_SIZE -ne 0 ]]
+    then
+       sudo qm disk resize scsi0 $DISKIMAGE_SIZE
+    fi
+
+    
 }
 
 

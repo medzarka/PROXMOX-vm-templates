@@ -17,7 +17,7 @@ TEMPLATE_VERSION=3.19
 RAM=512
 CORES=1
 IP=192.168.50.2/24
-DISKIMAGE_SIZE=1 
+DISKIMAGE_SIZE=2
 
 IMAGE_URL=https://filedn.com/luEnu9wIDvzholR0Mi4tGLb/linux_images/alpine_3.19_image.raw
 IMAGE_NAME=alpine_3.19_image.raw
