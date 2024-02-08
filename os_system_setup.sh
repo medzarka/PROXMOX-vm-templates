@@ -29,7 +29,7 @@ echo ""
 echo "------------------------------------------------------------------------"
 echo "Update the system ..."
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
-sudo bash -c "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"
+echo "debconf debconf/frontend select noninteractive" | sudo debconf-set-selections
 sudo apt-get update
 sudo apt-get upgrade -y --no-install-recommends
 sudo apt-get autoremove -y --purge
@@ -52,6 +52,7 @@ echo "------------------------------------------------------------------------"
 echo "Install required softwares..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
+echo "debconf debconf/frontend select noninteractive" | sudo debconf-set-selections
 sudo apt-get install --no-install-recommends neofetch htop chrony tzdata nano parted wget -y
 fi
 
@@ -86,6 +87,7 @@ echo "------------------------------------------------------------------------"
 echo "Install KVM guest agent (QEMU) ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
+echo "debconf debconf/frontend select noninteractive" | sudo debconf-set-selections
 sudo apt-get install --no-install-recommends qemu-guest-agent -y
 sudo systemctl enable qemu-guest-agent
 sudo systemctl start qemu-guest-agent
@@ -148,6 +150,7 @@ echo "------------------------------------------------------------------------"
 echo "Configure the firewall (only ssh port is accessible) ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
+echo "debconf debconf/frontend select noninteractive" | sudo debconf-set-selections
 sudo apt-get install --no-install-recommends ufw -y  # BUG install and config issue with debian 11
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
@@ -341,6 +344,7 @@ update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
 echo "------------------------------------" >> \$log_file 2>&1
 echo "Start system update at \${update_date_start}" >> \$log_file 2>&1
 sudo bash -c "echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections"
+echo "debconf debconf/frontend select noninteractive" | sudo debconf-set-selections
 sudo apt-get update >> \$log_file 2>&1
 sudo apt-get -y upgrade --no-install-recommends >> \$log_file 2>&1
 sudo apt-get -y autoremove --purge >> \$log_file 2>&1
@@ -423,6 +427,7 @@ echo "Cleaning the system ..."
 ########################################
 echo " --- Cleaning the package system ..."
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
+echo "debconf debconf/frontend select noninteractive" | sudo debconf-set-selections
 sudo apt-get -y clean 
 sudo apt-get -y autoclean 
 sudo apt-get -y autoremove --purge 
