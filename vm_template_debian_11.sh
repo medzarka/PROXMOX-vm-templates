@@ -18,7 +18,7 @@ RAM=1024
 CORES=1
 IP=192.168.50.21/24
 # RECHECK check the size
-DISKIMAGE_SIZE=3 
+DISKIMAGE_SIZE=3G 
 
 IMAGE_URL=https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-generic-amd64.raw
 IMAGE_NAME=debian-11-generic-amd64.raw

@@ -18,7 +18,7 @@ RAM=1024
 CORES=1
 IP=192.168.50.12/24
 # RECHECK check the size
-DISKIMAGE_SIZE=4 
+DISKIMAGE_SIZE=4G 
 
 IMAGE_URL=https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
 IMAGE_NAME=noble-server-cloudimg-amd64.img

@@ -17,7 +17,7 @@ TEMPLATE_VERSION=3.19
 RAM=512
 CORES=1
 IP=192.168.50.2/24
-DISKIMAGE_SIZE=2
+DISKIMAGE_SIZE=2G
 
 IMAGE_URL=https://filedn.com/luEnu9wIDvzholR0Mi4tGLb/linux_images/alpine_3.19_image.raw
 IMAGE_NAME=alpine_3.19_image.raw
@@ -47,7 +47,7 @@ TAGS=_template,os_${TEMPLATE_OS},v_${TEMPLATE_VERSION}
 
 #############################################################
 ### Download the VM disk image
-download_vm_disk_image $IMAGE_URL $IMAGE_PATH $DISKIMAGE_SIZE
+download_vm_disk_image $IMAGE_URL $IMAGE_PATH
 
 #############################################################
 ### Destroy the old VM if it exists

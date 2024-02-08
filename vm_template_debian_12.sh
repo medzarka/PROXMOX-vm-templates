@@ -18,7 +18,7 @@ RAM=1024
 CORES=1
 IP=192.168.50.22/24
 # RECHECK check the size
-DISKIMAGE_SIZE=3
+DISKIMAGE_SIZE=3G
 
 IMAGE_URL=https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.raw
 IMAGE_NAME=debian-12-generic-amd64.raw

@@ -58,9 +58,13 @@ create_new_template(){
     sudo qm set $TEMPLATE_VM_ID --nameserver $DNS 
     sudo qm set $TEMPLATE_VM_ID --searchdomain $MAIN_DOMAIN 
     sudo qm set $TEMPLATE_VM_ID --ciupgrade 0
-    if [[ $DISKIMAGE_SIZE -ne 0 ]]
+
+    if [ $DISKIMAGE_SIZE != "0G" ]
     then
-       sudo qm disk resize $TEMPLATE_VM_ID scsi0 ${DISKIMAGE_SIZE}G
+        echo "Update the disk image size to $DISKIMAGE_SIZE ..."
+        sudo qm disk resize $TEMPLATE_VM_ID scsi0 $DISKIMAGE_SIZE
+    else
+        echo "Disk image resize ignored"
     fi
 
     
@@ -71,7 +75,6 @@ create_new_template(){
 download_vm_disk_image(){
     IMAGE_URL=$1
     IMAGE_PATH=$2
-    DISKIMAGE_SIZE=$3
 
     echo ""
     echo "-----------------------------------------------------------------"
@@ -83,8 +86,6 @@ download_vm_disk_image(){
         else
             echo "Download the VM disk image ..."
             wget -O $IMAGE_PATH  $IMAGE_URL
-            du -sh $IMAGE_PATH
-            #qemu-img resize $IMAGE_PATH $DISKIMAGE_SIZE
             du -sh $IMAGE_PATH
         fi
 

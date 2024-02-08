@@ -18,7 +18,7 @@ RAM=1024
 CORES=1
 IP=192.168.50.48/24
 # RECHECK check the size
-DISKIMAGE_SIZE=0 
+DISKIMAGE_SIZE=0G
 
 IMAGE_URL=https://dl.rockylinux.org/pub/rocky/8/images/x86_64/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2
 IMAGE_NAME=Rocky-8-GenericCloud-Base.latest.x86_64.qcow2
