@@ -25,21 +25,29 @@ echo "Detected Linux distribution --> $LINUX_DISTRIBUTION"
 echo "Linux distribution version  --> $LINUX_DISTRIBUTION_VERSION"
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] && [ "$LINUX_DISTRIBUTION_VERSION" = "24.04" ]; then
+sudo apt-get update
+sudo apt-get install -y parted
 sudo parted -s -a opt /dev/sda "print free" "resizepart 4 yes 100%" "print free"
 sudo resize2fs /dev/sda1
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] && [ "$LINUX_DISTRIBUTION_VERSION" = "22.04" ]; then
+sudo apt-get update
+sudo apt-get install -y parted
 sudo parted -s -a opt /dev/sda "print free" "resizepart 3 yes 100%" "print free"
 sudo resize2fs /dev/sda1
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
+sudo apt-get update
+sudo apt-get install -y parted
 sudo parted -s -a opt /dev/sda "print free" "resizepart 3 yes 100%" "print free"
 sudo resize2fs /dev/sda1
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
+doas apk update
+
 doas parted -s -a opt /dev/sda "print free" "resizepart 3 yes 100%" "print free"
 doas resize2fs /dev/sda3
 fi
@@ -62,6 +70,7 @@ fi
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
 doas sed -i 's/#http/http/g' /etc/apk/repositories # enable community repository
 doas apk update
+doas apk --no-cache add parted
 doas apk upgrade --no-cache --available
 fi
 
@@ -175,7 +184,7 @@ echo "Configure the firewall (only ssh port is accessible) ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
 echo "debconf debconf/frontend select noninteractive" | sudo debconf-set-selections
-sudo apt-get install --no-install-recommends ufw -y  # BUG install and config issue with debian 11
+sudo apt-get install --no-install-recommends ufw -y 
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw limit ssh  # open SSH port and protect against brute-force login attacks
@@ -201,7 +210,7 @@ doas rc-service ufw restart
 doas rc-update add ufw default
 fi
 
-if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then # BUG ERROR:dbus.proxies:Introspect error on :1.47:/org/fedoraproject/FirewallD1: dbus.exceptions.DBusException: org.freedesktop.DBus.Error.NoReply: Did not receive a reply. Possible causes include: the remote application did not send a reply, the message bus security policy blocked the reply, the reply timeout expired, or the network connection was broken.
+if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then 
 sudo dnf install firewalld -y
 sudo systemctl enable firewalld
 sudo systemctl start firewalld
@@ -271,11 +280,10 @@ fi
 # [x] F10 - Disable IPV6
 echo ""
 echo "------------------------------------------------------------------------"
-echo "Diable IPV6 ..."
+echo "Disable IPV6 ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-#sudo bash -c 'cat << EOF > /etc/sysctl.d/99-disable-ipv6.conf
-sudo tee /etc/sysctl.d/99-disable-ipv6.conf <<EOF
+sudo tee /etc/sysctl.d/99-disable-ipv6.conf >/dev/null <<EOF
 # Diable IPV6 (Comment the three following lines to get IPV6 back)
 net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
@@ -289,7 +297,7 @@ echo " --- /etc/sysctl.d/99-disable-ipv6.conf file is created and applied"
 # COMMENT Then, We can solve the IPV6 issue by calling the following script hourly
 sudo mkdir -p /etc/cron.hourly
 #sudo bash -c 'cat <<EOF > /etc/cron.hourly/disable-ipv6
-sudo tee /etc/cron.hourly/disable-ipv6 <<EOF
+sudo tee /etc/cron.hourly/disable-ipv6 >/dev/null <<EOF
 #!/bin/bash
 sudo sysctl -p /etc/sysctl.d/99-disable-ipv6.conf
 EOF
@@ -299,7 +307,7 @@ echo " --- /etc/cron.hourly/disable-ipv6 hourly file is created"
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-doas tee /etc/sysctl.d/99-disable-ipv6.conf <<EOF
+doas tee /etc/sysctl.d/99-disable-ipv6.conf >/dev/null <<EOF
 # Diable IPV6 (Comment the three following lines to get IPV6 back)
 net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
@@ -362,7 +370,7 @@ echo " --- configure a system update script (that will be executed by proxmox) .
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then 
 #sudo bash -c 'cat << EOF > /root/update.sh   # RECHECK do not work on debian 11 and 12
-sudo tee /root/update.sh <<EOF
+sudo tee /root/update.sh >/dev/null <<EOF
 #!/bin/bash
 log_file=/var/log/system-update.log
 update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
@@ -386,7 +394,7 @@ sudo chmod a+x /root/update.sh
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
-doas tee /root/update.sh <<EOF # RECHECK do not work on Alpine, inexistant file
+doas tee /root/update.sh >/dev/null <<EOF # RECHECK do not work on Alpine, inexistant file
 #!/bin/sh
 log_file=/var/log/system-update.log
 update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
@@ -406,7 +414,7 @@ doas chmod a+x /root/update.sh
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
-sudo tee /root/update.sh <<EOF
+sudo tee /root/update.sh >/dev/null <<EOF
 #!/bin/sh
 log_file=/var/log/system-update.log
 update_date_start=\$(date +'%m-%d-%Y--%H:%M:%S')
@@ -428,7 +436,7 @@ echo " --- configure a backup list (that will be backuped by proxmox) ..."
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
 #sudo bash -c 'cat << EOF > /root/backup.list # RECHECK do not work on debian 11
-sudo tee /root/backup.list <<EOF
+sudo tee /root/backup.list >/dev/null <<EOF
 CONFIGS /etc
 ROOT    /root
 LOGS    /var/log
@@ -437,7 +445,7 @@ fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
 #doas sh -c 'cat << EOF > /root/backup.list # RECHECK do not work on Alpine, inexistant file
-doas tee /root/backup.list <<EOF
+doas tee /root/backup.list >/dev/null <<EOF
 CONFIGS /etc 
 ROOT    /root
 LOGS    /var/log
@@ -579,6 +587,19 @@ fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
 doas rm -rf /var/log/**
+fi
+
+########################################
+echo " --- Synchronizing the filesystem"
+
+# Wait so all the cache will be written before continueing.
+
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+sudo sync
+fi
+
+if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
+doas sync
 fi
 
 ########################################
