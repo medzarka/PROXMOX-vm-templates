@@ -8,8 +8,8 @@ LINUX_DISTRIBUTION_VERSION=$(cat /etc/*-release | grep VERSION_ID | head -n1 | c
 # POST Check of the templates
 # [x] Check Ubuntu 24.04 [disk size: 3584M | sda1 / (last) - 2.4G | sda16 /boot 881M | sda15 /boot/efi 105M | FREE SPACE AFTER UPDATE 984M | RAM: 166M] TEMPLATE OK
 # [x] Check Ubuntu 22.04 [disk size: 2252M | sda1 / (last) - 2G   | sda15 /boot/efi 105M | FREE SPACE AFTER UPDATE 50M WITH ERROR | RAM: 169M]
-# [ ] Check Debian 12 [disk size: 2G | sda1 / (last) - 1.9G | sda15 /boot/efi 130M | FREE SPACE AFTER UPDATE 540M | RAM: 110M]
-# [ ] Check Ubuntu 11 [disk size: 2G | sda1 / (last) - 1.9G | sda15 /boot/efi 130M | FREE SPACE AFTER UPDATE 651M | RAM: 65M]
+# [x] Check Debian 12 [disk size: 2G | sda1 / (last) - 1.9G | sda15 /boot/efi 130M | FREE SPACE AFTER UPDATE 540M | RAM: 110M]
+# [x] Check Ubuntu 11 [disk size: 2G | sda1 / (last) - 1.9G | sda15 /boot/efi 130M | FREE SPACE AFTER UPDATE 651M | RAM: 65M]
 # [x] Check Alpine 3.19 [disk size: 1G | sda3 / (last) - 427M | sda1 /boot 271M | FREE SPACE AFTER UPDATE 248M | RAM: 45M]
 # [ ] Check Rocky 9
 # [ ] Check Rocky 8

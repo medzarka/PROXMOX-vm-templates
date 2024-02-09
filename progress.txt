@@ -1,5 +1,4 @@
 # TODO 3 - install and configure oracle-shares.
-# TODO 4 - add sync in /root/update.sh
 # TODO 5 - think about mega.nz .
 
 
