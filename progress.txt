@@ -1,5 +1,3 @@
-# TODO 1 - install bash and sudo on alpine raw image.
-# TODO 2 - update os setup call from ssh to bash.
 # TODO 3 - install and configure oracle-shares.
 # TODO 4 - add sync in /root/update.sh
 # TODO 5 - think about mega.nz .
@@ -108,8 +106,8 @@
 
 
 # [ ] F10 - Disable IPV6
-    #  BUG Ubuntu 24.04 -- The IPv6 still working even after calling the cron based script. The file is not written !
-    #  BUG Ubuntu 22.04 -- The IPv6 still working even after calling the cron based script. The file is not written ! 
+    #  [x] Ubuntu 24.04 
+    #  [x] Ubuntu 22.04 
     #  [x] Debian 12
     #  [x] Debian 11
     #  [x] Alpine Linux 3.19
@@ -128,11 +126,11 @@
 
 
 # [ ] F12 - configure update script and backup's folders list
-    #  BUG Ubuntu 24.04 # the files exist but empty
-    #  BUG Ubuntu 22.04 # the files exist but empty 
+    #  [x] Ubuntu 24.04 
+    #  [x] Ubuntu 22.04 
     #  [x] Debian 12
     #  [x] Debian 11
-    #  BUG Alpine Linux 3.19  # the files does not exist.
+    #  [x] Alpine Linux 3.19  # the files does not exist.
     #  [ ] Rocky Linux 9
     #  [ ] Rocky Linux 8
 

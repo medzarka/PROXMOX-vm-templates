@@ -48,6 +48,7 @@ Once the virtual machines, that we will use as templates, are created, we execut
   - Cleaning /tmp directories,
   - Cleaning ssh keys,
   - Reset the hostname,
-  - and finally cleaning log files.
+  - cleaning log files,
+  - and finally call `sync` to flush cache to disk.
 
   

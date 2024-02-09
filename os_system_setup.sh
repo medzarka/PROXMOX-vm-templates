@@ -384,6 +384,7 @@ sudo apt-get -y autoremove --purge >> \$log_file 2>&1
 sudo apt-get -y clean >> \$log_file 2>&1
 sudo apt-get -y autoclean  >> \$log_file 2>&1
 sudo apt-get -y autoremove --purge >> \$log_file 2>&1 
+sudo sync
 update_date_end=\$(date +'%m-%d-%Y--%H:%M:%S')
 echo "Update ended at \${update_date_end}" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
@@ -404,6 +405,7 @@ doas /sbin/apk update >> \$log_file 2>&1
 doas /sbin/apk upgrade --no-cache --available >> \$log_file 2>&1
 doas /sbin/apk -v cache clean >> \$log_file 2>&1
 doas /sbin/apk -v cache purge >> \$log_file 2>&1
+doas sync
 update_date_end=\$(date +'%m-%d-%Y--%H:%M:%S')
 echo "Update ended at \${update_date_end}" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
@@ -423,6 +425,7 @@ echo "Start system update at \${update_date_start}" >> \$log_file 2>&1
 sudo dnf update -y >> \$log_file 2>&1
 sudo dnf clean dbcache >> \$log_file 2>&1
 sudo dnf clean all >> \$log_file 2>&1 
+sudo sync
 update_date_end=\$(date +'%m-%d-%Y--%H:%M:%S')
 echo "Update ended at \${update_date_end}" >> \$log_file 2>&1
 echo "" >> \$log_file 2>&1
