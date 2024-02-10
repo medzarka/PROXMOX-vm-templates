@@ -3,6 +3,10 @@
 # NOTE - Template scripts
 
 convert_vm_to_template(){
+    echo " --- dump the vm $TEMPLATE_VM_ID"
+    sudo vzdump $TEMPLATE_VM_ID --mode stop --mailto root 
+
+    echo " --- convert the vm $TEMPLATE_VM_ID to a template"
     sudo qm template $TEMPLATE_VM_ID
 }
 
