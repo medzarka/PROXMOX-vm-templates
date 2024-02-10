@@ -37,6 +37,8 @@ template_os_setup(){
     echo "   execute the script on the template"
     ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEFAULT_USER@$IPP 'sh -s' < os_system_setup.sh
     echo "   the execution of the script on the template is done."
+
+    
     
     
 }
@@ -78,6 +80,8 @@ create_new_template(){
     else
         echo "Disk image resize ignored"
     fi
+
+    sudo sync
 
     
 }
