@@ -62,6 +62,10 @@ create_new_template
 ### Start the VM template, wait it to start, and then execute the setup script 
 template_os_setup
 
+#############################################################
+### Convert the VM to a template
+convert_vm_to_template
+
 
 #############################################################
 echo "----------------------------------------------------------------------------------------"

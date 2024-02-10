@@ -2,6 +2,10 @@
 
 # NOTE - Template scripts
 
+convert_vm_to_template(){
+    qm template $TEMPLATE_VM_ID
+}
+
 template_os_setup(){
     echo "-----------------------------------------------------------------"
     echo "Configuring the template OS system ..."
