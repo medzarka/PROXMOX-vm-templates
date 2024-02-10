@@ -3,6 +3,10 @@
 # NOTE - Template scripts
 
 convert_vm_to_template(){
+
+    echo " --- shutdown the template"
+    sudo qm shutdown $TEMPLATE_VM_ID --forceStop 1 --timeout 60
+
     echo " --- dump the vm $TEMPLATE_VM_ID"
     sudo vzdump $TEMPLATE_VM_ID --mode stop --mailto root 
 
@@ -32,9 +36,9 @@ template_os_setup(){
 
     echo "   execute the script on the template"
     ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $DEFAULT_USER@$IPP 'sh -s' < os_system_setup.sh
+    echo "   the execution of the script on the template is done."
     
-    echo "   shutdown the template"
-    sudo qm stop $TEMPLATE_VM_ID
+    
 }
 
 create_new_template(){
