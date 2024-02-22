@@ -20,8 +20,8 @@ IP=192.168.50.35/24
 # RECHECK check the size
 DISKIMAGE_SIZE=2G 
 
-IMAGE_URL=https://filedn.com/luEnu9wIDvzholR0Mi4tGLb/linux_images/vyos_1.5_image.img
-IMAGE_NAME=vyos_1.5_image.img
+IMAGE_URL=https://filedn.com/luEnu9wIDvzholR0Mi4tGLb/linux_images/vyos_1.5_image.raw
+IMAGE_NAME=vyos_1.5_image.raw
 IMAGE_PATH=/var/lib/vz/template/cache/$IMAGE_NAME
 
 # [x] Load common VM template configurations
