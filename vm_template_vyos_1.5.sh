@@ -62,42 +62,42 @@ create_new_template
 ### Start the VM template, wait it to start, and then execute the setup script 
 #template_os_setup
 
-sudo tee user-data >/dev/null <<EOF
-vyos_config_commands:
-  - configure
-  - set system host-name 'vyos-1.5-template'
-  - delete interfaces ethernet eth1 address 'dhcp'
-  - set system login user "$DEFAULT_USER" authentication encrypted-password "$(openssl passwd -6 $USER_PASSWORD)"
-  - set interfaces ethernet eth1 address "$IP"
-  - set interfaces ethernet eth1 description 'MGMT'
-  - set protocols static route 0.0.0.0/0 next-hop "$GW"
-  - set system login user vyos disable
-  - commit
-  - save
-EOF
+#sudo tee user-data >/dev/null <<EOF
+#vyos_config_commands:
+#  - configure
+#  - set system host-name 'vyos-1.5-template'
+#  - delete interfaces ethernet eth1 address 'dhcp'
+#  - set system login user "$DEFAULT_USER" authentication encrypted-password "$(openssl passwd -6 $USER_PASSWORD)"
+#  - set interfaces ethernet eth1 address "$IP"
+#  - set interfaces ethernet eth1 description 'MGMT'
+#  - set protocols static route 0.0.0.0/0 next-hop "$GW"
+#  - set system login user vyos disable
+#  - commit
+#  - save
+#EOF
 
-sudo tee network-config >/dev/null <<EOF
-version: 2
-ethernets:
-  eth0:
-    dhcp4: false
-    dhcp6: false
-EOF
+#sudo tee network-config >/dev/null <<EOF
+#version: 2
+#ethernets:
+#  eth0:
+#    dhcp4: false
+#    dhcp6: false
+#EOF
 
-sudo tee meta-data >/dev/null <<EOF
-EOF
+#sudo tee meta-data >/dev/null <<EOF
+#EOF
 
-mkisofs -joliet -rock -volid "cidata" -output seed.iso meta-data user-data network-config
-rm -rf /var/lib/vz/template/iso/seed.iso
-mv seed.iso /var/lib/vz/template/iso/
-qm set $TEMPLATE_VM_ID --ide2 none
-qm set $TEMPLATE_VM_ID --ide2 media=cdrom,file=local:iso/seed.iso
+#mkisofs -joliet -rock -volid "cidata" -output seed.iso meta-data user-data network-config
+#rm -rf /var/lib/vz/template/iso/seed.iso
+#mv seed.iso /var/lib/vz/template/iso/
+#qm set $TEMPLATE_VM_ID --ide2 none
+#qm set $TEMPLATE_VM_ID --ide2 media=cdrom,file=local:iso/seed.iso
 
 #############################################################
 ### Convert the VM to a template
-#convert_vm_to_template
+convert_vm_to_template
 
-qm start $TEMPLATE_VM_ID
+#qm start $TEMPLATE_VM_ID
 #qm shutdown $TEMPLATE_VM_ID --forceStop 1 --timeout 60
 #vzdump $TEMPLATE_VM_ID --mode stop --mailto root 
 #qm template $TEMPLATE_VM_ID
