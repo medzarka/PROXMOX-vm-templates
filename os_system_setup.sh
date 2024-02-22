@@ -62,7 +62,7 @@ fi
 echo ""
 echo "------------------------------------------------------------------------"
 echo "Update the system ..."
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
 echo "debconf debconf/frontend select noninteractive" | sudo debconf-set-selections
 sudo apt-get update
 sudo apt-get upgrade -y --no-install-recommends
@@ -83,11 +83,16 @@ fi
 # [x] F2 - Install required softwares
 echo ""
 echo "------------------------------------------------------------------------"
-echo "Install required softwares..."
+echo "Install required softwares..." 
 
 if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
 echo "debconf debconf/frontend select noninteractive" | sudo debconf-set-selections
 sudo apt-get install --no-install-recommends neofetch htop chrony tzdata nano parted wget -y
+fi
+
+if [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
+echo "debconf debconf/frontend select noninteractive" | sudo debconf-set-selections
+sudo apt-get install --no-install-recommends htop chrony tzdata nano parted wget -y
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
@@ -109,9 +114,20 @@ if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] 
 sudo timedatectl set-timezone Asia/Riyadh
 sudo timedatectl # to check
 fi
+
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
 doas setup-timezone -z Asia/Riyadh
 doas rc-update add chronyd default
+fi
+
+if [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
+configure
+set system time-zone Asia/Riyadh
+#delete system ntp
+#set system ntp server 0.nl.pool.ntp.org
+#set system ntp server 1.nl.pool.ntp.org
+commit
+save
 fi
 
 ## ------------------------------------------------------------------------
@@ -223,6 +239,11 @@ sudo firewall-cmd --permanent --add-service=ssh
 sudo firewall-cmd --reload
 fi
 
+if [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then 
+#sudo dnf install firewalld -y
+
+fi
+
 # [x] F8 Hardening SSH
 echo ""
 echo "------------------------------------------------------------------------"
@@ -257,6 +278,35 @@ sudo sed -r -i 's/^#?PermitRootLogin.*/PermitRootLogin no/g' /etc/ssh/sshd_confi
 sudo sed -r -i 's/^#?PasswordAuthentication.*/PasswordAuthentication no/g' /etc/ssh/sshd_config # Do not allow password authentication.
 sudo systemctl restart sshd
 fi
+
+if [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then 
+configure
+set service ssh port '22'
+set service ssh listen-address 192.168.0.0
+set service ssh disable-password-authentication
+set service ssh ciphers aes128-cbc
+set service ssh ciphers aes128-ctr           
+set service ssh ciphers aes128-gcm@openssh.com
+set service ssh ciphers aes192-cbc           
+set service ssh ciphers aes192-ctr           
+set service ssh ciphers aes256-cbc           
+set service ssh ciphers aes256-ctr           
+set service ssh ciphers aes256-gcm@openssh.com
+set service ssh ciphers chacha20-poly1305@openssh.com
+set service ssh mac hmac-sha2-256        
+set service ssh mac hmac-sha2-256-etm@openssh.com
+set service ssh mac hmac-sha2-512        
+set service ssh mac hmac-sha2-512-etm@openssh.com
+set service ssh key-exchange curve25519-sha256    
+set service ssh key-exchange curve25519-sha256@libssh.org
+set service ssh key-exchange diffie-hellman-group-exchange-sha256
+set service ssh key-exchange diffie-hellman-group14-sha256
+set service ssh key-exchange diffie-hellman-group16-sha512
+set service ssh key-exchange diffie-hellman-group18-sha512
+commit
+save
+fi
+
 echo " --- /etc/ssh/sshd_config file is updated"
 
 # [x] F9 Delete the root password
@@ -264,7 +314,7 @@ echo ""
 echo "------------------------------------------------------------------------"
 echo "Lock the root user ..."
 
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ] || [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
 sudo passwd -d root  # to delete the password.
 sudo passwd -l root  # to lock the user.
 fi
@@ -463,7 +513,7 @@ echo "Cleaning the system ..."
 
 ########################################
 echo " --- Cleaning the package system ..."
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
 echo "debconf debconf/frontend select noninteractive" | sudo debconf-set-selections
 sudo apt-get -y clean 
 sudo apt-get -y autoclean 
@@ -505,7 +555,7 @@ fi
 ########################################
 echo " --- Clear the machine-id"
 
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ] || [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
 sudo truncate -s0 /etc/machine-id
 sudo rm -f /var/lib/dbus/machine-id
 fi
@@ -518,7 +568,7 @@ fi
 ########################################
 echo " --- Run cloud-init clean"
 
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ] || [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
 sudo cloud-init clean
 fi
 
@@ -530,7 +580,7 @@ fi
 ########################################
 echo " --- Clear Shell History"
 
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ] || [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
 sudo rm -rf /root/.*history     # remove command history
 sudo find /home -type f  -name '.*_history' -delete
 fi
@@ -543,7 +593,7 @@ fi
 ########################################
 echo " --- Cleanup /tmp directories"
 
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ] || [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
 sudo rm -rf /tmp/*
 sudo rm -rf /var/tmp/*
 fi
@@ -556,7 +606,7 @@ fi
 ########################################
 echo " --- Cleanup current ssh keys"
 
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ] || [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
 sudo rm -f /etc/ssh/*_key /etc/ssh/*_key.pub /etc/ssh/ssh_host_*   # remove host keys
 sudo rm -f /root/.ssh/authorized_keys
 sudo find /home -type f  -name 'authorized_keys' -delete
@@ -573,7 +623,7 @@ fi
 ########################################
 echo " --- Reset hostname"
 
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ] || [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
 sudo bash -c "echo /dev/null >> /etc/hostname"
 fi
 
@@ -585,7 +635,7 @@ fi
 ########################################
 echo " --- Cleaning log files"
 
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ] || [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
 sudo rm -rf /var/log/**
 fi
 
@@ -598,7 +648,7 @@ echo " --- Synchronizing the filesystem"
 
 # Wait so all the cache will be written before continueing.
 
-if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then
+if [ "$LINUX_DISTRIBUTION" = "Ubuntu" ] || [ "$LINUX_DISTRIBUTION" = "Debian" ] || [ "$LINUX_DISTRIBUTION" = "Rocky" ] || [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
 sudo sync
 fi
 
@@ -638,10 +688,6 @@ fi
 #EOF'
 
 #sudo reboot
-
-# TODO 
-# [ ] - write a tutorial to create a swap file and update the swapiness and the cache pressure.
-
 
 
 

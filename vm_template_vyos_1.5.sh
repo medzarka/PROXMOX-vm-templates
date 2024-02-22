@@ -122,11 +122,11 @@ sleep 20
 qm set $TEMPLATE_VM_ID --ide2 none
 qm set $TEMPLATE_VM_ID --ide2 local-lvm:cloudinit 
 
-#template_os_setup
+template_os_setup
 
 #############################################################
 ### Convert the VM to a template
-#convert_vm_to_template
+convert_vm_to_template
 
 #qm start $TEMPLATE_VM_ID
 #qm shutdown $TEMPLATE_VM_ID --forceStop 1 --timeout 60
