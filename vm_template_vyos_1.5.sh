@@ -16,7 +16,7 @@ TEMPLATE_OS=vyos
 TEMPLATE_VERSION=1.5
 RAM=1024
 CORES=1
-IP=192.168.50.35/24
+IP=192.168.10.253/24
 # RECHECK check the size
 DISKIMAGE_SIZE=2G 
 
@@ -40,9 +40,9 @@ USER_PASSWORD=$RETURN_VALUE
 
 TEMPLATE_NAME=${TEMPLATE_TYPE}-${TEMPLATE_OS}-${TEMPLATE_VERSION} 
 STORAGE=local-lvm   
-GW=192.168.50.1
-DNS=192.168.50.1
-VLAN=50
+GW=192.168.10.254
+DNS=8.8.8.8
+VLAN=10
 BRIDGE=vmbr1 
 TAGS=_template,os_${TEMPLATE_OS},v_${TEMPLATE_VERSION} 
 
@@ -60,12 +60,49 @@ create_new_template
 
 #############################################################
 ### Start the VM template, wait it to start, and then execute the setup script 
-template_os_setup
+#template_os_setup
+
+sudo tee user-data >/dev/null <<EOF
+vyos_config_commands:
+  - set system host-name 'vyos-1.5-template'
+  - delete interfaces ethernet eth0 address 'dhcp'
+  - set system login user "$DEFAULT_USER" authentication encrypted-password "$(openssl passwd -6 $USER_PASSWORD)"
+  - set interfaces ethernet eth0 address "$IP"
+  - set interfaces ethernet eth0 description 'MGMT'
+  - set protocols static route 0.0.0.0/0 next-hop "$GW"
+  - set system login user vyos disable
+EOF
+
+sudo tee network-config >/dev/null <<EOF
+version: 2
+ethernets:
+  eth0:
+    dhcp4: false
+    dhcp6: false
+EOF
+
+sudo tee meta-data >/dev/null <<EOF
+EOF
+
+mkisofs -joliet -rock -volid "cidata" -output seed.iso meta-data user-data network-config
+rm -rf /var/lib/vz/template/iso/seed.iso
+mv seed.iso /var/lib/vz/template/iso/
+qm set $TEMPLATE_VM_ID --ide2 none
+qm set $TEMPLATE_VM_ID --ide2 media=cdrom,file=local:iso/seed.iso
 
 #############################################################
 ### Convert the VM to a template
-convert_vm_to_template
+#convert_vm_to_template
 
+qm start $TEMPLATE_VM_ID
+#qm shutdown $TEMPLATE_VM_ID --forceStop 1 --timeout 60
+#vzdump $TEMPLATE_VM_ID --mode stop --mailto root 
+#qm template $TEMPLATE_VM_ID
+
+
+rm -rf user-data
+rm -rf network-config
+rm -rf meta-data
 
 #############################################################
 echo "----------------------------------------------------------------------------------------"

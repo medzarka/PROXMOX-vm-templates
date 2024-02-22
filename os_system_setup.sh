@@ -16,6 +16,7 @@ LINUX_DISTRIBUTION_VERSION=$(cat /etc/*-release | grep VERSION_ID | head -n1 | c
 
 # SEE NOTES -----------------------------------------------------------------------
 
+# TODO add VyOS distribution
 
 # [x] F0 - System identification and disk size expand ... 
 echo ""
