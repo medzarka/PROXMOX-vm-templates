@@ -64,13 +64,16 @@ create_new_template
 
 sudo tee user-data >/dev/null <<EOF
 vyos_config_commands:
+  - configure
   - set system host-name 'vyos-1.5-template'
-  - delete interfaces ethernet eth0 address 'dhcp'
+  - delete interfaces ethernet eth1 address 'dhcp'
   - set system login user "$DEFAULT_USER" authentication encrypted-password "$(openssl passwd -6 $USER_PASSWORD)"
-  - set interfaces ethernet eth0 address "$IP"
-  - set interfaces ethernet eth0 description 'MGMT'
+  - set interfaces ethernet eth1 address "$IP"
+  - set interfaces ethernet eth1 description 'MGMT'
   - set protocols static route 0.0.0.0/0 next-hop "$GW"
   - set system login user vyos disable
+  - commit
+  - save
 EOF
 
 sudo tee network-config >/dev/null <<EOF
@@ -100,9 +103,9 @@ qm start $TEMPLATE_VM_ID
 #qm template $TEMPLATE_VM_ID
 
 
-rm -rf user-data
-rm -rf network-config
-rm -rf meta-data
+#rm -rf user-data
+#rm -rf network-config
+#rm -rf meta-data
 
 #############################################################
 echo "----------------------------------------------------------------------------------------"
