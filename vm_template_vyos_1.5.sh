@@ -84,19 +84,18 @@ create_new_template
 
 #############################################################
 ### Start the VM template, wait it to start, and then execute the setup script 
-#template_os_setup
+
+# > before proceed to template_os_setup, we should update some files so VyOS could recognize proxmox cloud-init configurations
 
 sudo tee user-data >/dev/null <<EOF
 #cloud-config
 vyos_config_commands:
-  - configure
-  - set system host-name 'vyos-1.5-template'
-  - set service ntp server 1.pool.ntp.org
-  - set service ntp server 2.pool.ntp.org
-  - delete interfaces ethernet eth0 address 'dhcp'
-  - set interfaces ethernet eth0 address '192.168.10.252/24'
-  - set interfaces ethernet eth0 description 'VYOS-TEMPLATE'
-  - set protocols static route 0.0.0.0/0 next-hop '192.168.10.254'
+  - echo 'isofs' | sudo tee /etc/modules-load.d/isofs.conf
+  - echo 'datasource_list: [ NoCloud, ConfigDrive, None ]' | sudo tee /etc/cloud/cloud.cfg.d/99_pve.cfg
+  - sudo chmod -x /etc/modules-load.d/isofs.conf
+  - sudo chmod 644 /etc/cloud/cloud.cfg.d/99_pve.cfg
+  - sudo cloud-init init
+  - sudo cloud-init clean
 EOF
 
 sudo tee network-config >/dev/null <<EOF
@@ -116,9 +115,18 @@ mv /tmp/seed.iso /var/lib/vz/template/iso/
 qm set $TEMPLATE_VM_ID --ide2 none
 qm set $TEMPLATE_VM_ID --ide2 media=cdrom,file=local:iso/seed.iso
 
+qm start $TEMPLATE_VM_ID 
+sleep 20
+qm stop $TEMPLATE_VM_ID 
+sleep 20
+qm set $TEMPLATE_VM_ID --ide2 none
+qm set $TEMPLATE_VM_ID --ide2 local-lvm:cloudinit 
+
+#template_os_setup
+
 #############################################################
 ### Convert the VM to a template
-convert_vm_to_template
+#convert_vm_to_template
 
 #qm start $TEMPLATE_VM_ID
 #qm shutdown $TEMPLATE_VM_ID --forceStop 1 --timeout 60
