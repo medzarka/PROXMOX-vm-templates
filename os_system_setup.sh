@@ -121,13 +121,13 @@ doas rc-update add chronyd default
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then
-configure
-set system time-zone Asia/Riyadh
+sudo configure
+sudo set system time-zone Asia/Riyadh
 #delete system ntp
 #set system ntp server 0.nl.pool.ntp.org
 #set system ntp server 1.nl.pool.ntp.org
-commit
-save
+sudo commit
+sudo save
 fi
 
 ## ------------------------------------------------------------------------
@@ -241,6 +241,7 @@ fi
 
 if [ "$LINUX_DISTRIBUTION" = "VyOS" ]; then 
 #sudo dnf install firewalld -y
+echo ' '
 
 fi
 
