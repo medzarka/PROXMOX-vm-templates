@@ -63,7 +63,7 @@ create_new_template(){
     sudo qm set $TEMPLATE_VM_ID --serial0 socket --vga serial0 
     sudo qm set $TEMPLATE_VM_ID --agent enabled=1 
     sudo qm set $TEMPLATE_VM_ID --tags $TAGS 
-    sudo qm set $TEMPLATE_VM_ID --ide2 local-lvm:cloudinit 
+    sudo qm set $TEMPLATE_VM_ID --ide2 $STORAGE:cloudinit 
     sudo qm set $TEMPLATE_VM_ID --ciuser $DEFAULT_USER 
     sudo qm set $TEMPLATE_VM_ID --cipassword $(openssl passwd -6 $USER_PASSWORD) 
     sudo qm set $TEMPLATE_VM_ID --sshkeys /root/.ssh/authorized_keys 
