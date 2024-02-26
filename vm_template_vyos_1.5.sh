@@ -63,7 +63,7 @@ create_retrive_specific_template_user_password_from_pass $TEMPLATE_VM_ID $DEFAUL
 USER_PASSWORD=$RETURN_VALUE
 
 TEMPLATE_NAME=${TEMPLATE_TYPE}-${TEMPLATE_OS}-${TEMPLATE_VERSION} 
-STORAGE=local-lvm   
+STORAGE=local-zfs   
 GW=192.168.10.254
 DNS=8.8.8.8
 VLAN=10
