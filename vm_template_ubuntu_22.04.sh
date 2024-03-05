@@ -10,13 +10,13 @@ source lib/common_vm_scripts.sh
 
 # [x] Specific VM template configurations
 # Specific configs
-TEMPLATE_VM_ID=5122
+TEMPLATE_VM_ID=5010
 TEMPLATE_TYPE=template
 TEMPLATE_OS=ubuntu
 TEMPLATE_VERSION=22.04
 RAM=1024
 CORES=1
-IP=192.168.50.11/24
+IP=192.168.50.10/24
 # RECHECK check the size
 DISKIMAGE_SIZE=4G
 

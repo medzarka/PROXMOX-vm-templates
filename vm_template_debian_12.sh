@@ -10,13 +10,13 @@ source lib/common_vm_scripts.sh
 
 # [x] Specific VM template configurations
 # Specific configs
-TEMPLATE_VM_ID=5212
+TEMPLATE_VM_ID=5006
 TEMPLATE_TYPE=template
 TEMPLATE_OS=debian
 TEMPLATE_VERSION=12
 RAM=1024
 CORES=1
-IP=192.168.50.22/24
+IP=192.168.50.06/24
 # RECHECK check the size
 DISKIMAGE_SIZE=3G
 
@@ -43,7 +43,7 @@ STORAGE=local-zfs
 GW=192.168.50.1
 DNS=192.168.50.1
 VLAN=50
-BRIDGE=vmbr1 
+BRIDGE=vmbr1
 TAGS=_template,os_${TEMPLATE_OS},v_${TEMPLATE_VERSION} 
 
 #############################################################

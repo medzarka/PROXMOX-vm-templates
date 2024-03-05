@@ -10,13 +10,13 @@ source lib/common_vm_scripts.sh
 
 # [x] Specific VM template configurations
 # Specific configs
-TEMPLATE_VM_ID=5408
+TEMPLATE_VM_ID=5020
 TEMPLATE_TYPE=template
 TEMPLATE_OS=rocky
 TEMPLATE_VERSION=8
 RAM=1024
 CORES=1
-IP=192.168.50.48/24
+IP=192.168.50.20/24
 # RECHECK check the size
 DISKIMAGE_SIZE=0G
 

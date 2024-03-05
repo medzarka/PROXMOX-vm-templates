@@ -10,13 +10,13 @@ source lib/common_vm_scripts.sh
 
 # [x] Specific VM template configurations
 # Specific configs
-TEMPLATE_VM_ID=5001
+TEMPLATE_VM_ID=5015
 TEMPLATE_TYPE=template
 TEMPLATE_OS=alpine
 TEMPLATE_VERSION=3.19
 RAM=512
 CORES=1
-IP=192.168.50.2/24
+IP=192.168.50.15/24
 DISKIMAGE_SIZE=2G
 
 IMAGE_URL=https://filedn.com/luEnu9wIDvzholR0Mi4tGLb/linux_images/alpine_3.19_image.raw
