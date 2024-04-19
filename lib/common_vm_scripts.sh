@@ -1,4 +1,8 @@
-
+STORAGE=local-zfs   
+GW=192.168.50.1 
+DNS=192.168.50.1
+VLAN=50
+BRIDGE=vmbr1 
 
 # NOTE - Template scripts
 
@@ -55,7 +59,7 @@ create_new_template(){
     sudo qm set $TEMPLATE_VM_ID --cores $CORES --cpu cputype=host 
     sudo qm set $TEMPLATE_VM_ID --scsihw virtio-scsi-single
     sudo qm importdisk $TEMPLATE_VM_ID $IMAGE_PATH $STORAGE
-    sudo qm set $TEMPLATE_VM_ID --scsi0 $STORAGE:vm-$TEMPLATE_VM_ID-disk-0,backup=0,aio=io_uring,cache=unsafe,discard=on,iothread=1,ssd=1
+    sudo qm set $TEMPLATE_VM_ID --scsi0 $STORAGE:vm-$TEMPLATE_VM_ID-disk-0,backup=1,aio=io_uring,cache=unsafe,discard=on,iothread=1,ssd=1
     sudo qm set $TEMPLATE_VM_ID --boot c --bootdisk scsi0
     sudo qm set $TEMPLATE_VM_ID --tablet 0 
     sudo qm set $TEMPLATE_VM_ID --serial0 socket --vga serial0 
@@ -79,15 +83,15 @@ create_new_template(){
         echo "System Disk image resize ignored"
     fi
 
-    if [ $DATA_DISK_SIZE != "0G" ]
-    then
-        echo "Create the disk data disk with size equal to $DATA_DISK_SIZE ..."
-        G_char="G"
-        DISK_SIZE="${DATA_DISK_SIZE//$G_char}"
-        sudo qm set $TEMPLATE_VM_ID --scsi1 $STORAGE:$DISK_SIZE,backup=1,aio=io_uring,cache=unsafe,discard=on,iothread=1,ssd=1 
-    else
-        echo "Data Disk image creation ignored"
-    fi
+    #if [ $DATA_DISK_SIZE != "0G" ]
+    #then
+    #    echo "Create the disk data disk with size equal to $DATA_DISK_SIZE ..."
+    #    G_char="G"
+    #    DISK_SIZE="${DATA_DISK_SIZE//$G_char}"
+    #    sudo qm set $TEMPLATE_VM_ID --scsi1 $STORAGE:$DISK_SIZE,backup=1,aio=io_uring,cache=unsafe,discard=on,iothread=1,ssd=1 
+    #else
+    #    echo "Data Disk image creation ignored"
+    #fi
 
     sudo sync
 

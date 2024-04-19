@@ -19,7 +19,7 @@ CORES=1
 IP=192.168.50.5/24
 # RECHECK check the size
 SYSTEM_DISK_SIZE=3G
-DATA_DISK_SIZE=1G
+
 
 IMAGE_URL=https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-generic-amd64.raw
 IMAGE_NAME=debian-11-generic-amd64.raw
@@ -40,11 +40,6 @@ create_retrive_specific_template_user_password_from_pass $TEMPLATE_VM_ID $DEFAUL
 USER_PASSWORD=$RETURN_VALUE
 
 TEMPLATE_NAME=${TEMPLATE_TYPE}-${TEMPLATE_OS}-${TEMPLATE_VERSION} 
-STORAGE=local-zfs   
-GW=192.168.50.1
-DNS=192.168.50.1
-VLAN=50
-BRIDGE=vmbr1 
 TAGS=_template,os_${TEMPLATE_OS},v_${TEMPLATE_VERSION} 
 
 #############################################################

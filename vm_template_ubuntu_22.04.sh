@@ -19,7 +19,6 @@ CORES=1
 IP=192.168.50.10/24
 # RECHECK check the size
 SYSTEM_DISK_SIZE=4G
-DATA_DISK_SIZE=1G
 
 IMAGE_URL=https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
 IMAGE_NAME=jammy-server-cloudimg-amd64.img
@@ -40,11 +39,6 @@ create_retrive_specific_template_user_password_from_pass $TEMPLATE_VM_ID $DEFAUL
 USER_PASSWORD=$RETURN_VALUE
 
 TEMPLATE_NAME=${TEMPLATE_TYPE}-${TEMPLATE_OS}-${TEMPLATE_VERSION} 
-STORAGE=local-zfs   
-GW=192.168.50.1 
-DNS=192.168.50.1
-VLAN=50
-BRIDGE=vmbr1 
 TAGS=_template,os_${TEMPLATE_OS},v_${TEMPLATE_VERSION} 
 
 #############################################################
