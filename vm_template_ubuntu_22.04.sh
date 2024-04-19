@@ -18,7 +18,8 @@ RAM=1024
 CORES=1
 IP=192.168.50.10/24
 # RECHECK check the size
-DISKIMAGE_SIZE=4G
+SYSTEM_DISK_SIZE=4G
+DATA_DISK_SIZE=1G
 
 IMAGE_URL=https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
 IMAGE_NAME=jammy-server-cloudimg-amd64.img

@@ -57,8 +57,6 @@ create_new_template(){
     sudo qm importdisk $TEMPLATE_VM_ID $IMAGE_PATH $STORAGE
     sudo qm set $TEMPLATE_VM_ID --scsi0 $STORAGE:vm-$TEMPLATE_VM_ID-disk-0,aio=io_uring,cache=unsafe,discard=on,iothread=1,ssd=1
     sudo qm set $TEMPLATE_VM_ID --boot c --bootdisk scsi0
-    #sudo qm set $TEMPLATE_VM_ID --scsi0 $STORAGE:$DISKIMAGE_SIZE,aio=io_uring,cache=unsafe,discard=on,iothread=1,ssd=1 
-    #sudo qm set $TEMPLATE_VM_ID --boot c --bootdisk scsi0 
     sudo qm set $TEMPLATE_VM_ID --tablet 0 
     sudo qm set $TEMPLATE_VM_ID --serial0 socket --vga serial0 
     sudo qm set $TEMPLATE_VM_ID --agent enabled=1 
@@ -73,12 +71,20 @@ create_new_template(){
     sudo qm set $TEMPLATE_VM_ID --searchdomain $MAIN_DOMAIN 
     sudo qm set $TEMPLATE_VM_ID --ciupgrade 0
 
-    if [ $DISKIMAGE_SIZE != "0G" ]
+    if [ $SYSTEM_DISK_SIZE != "0G" ]
     then
-        echo "Update the disk image size to $DISKIMAGE_SIZE ..."
-        sudo qm disk resize $TEMPLATE_VM_ID scsi0 $DISKIMAGE_SIZE
+        echo "Update the disk image size to $SYSTEM_DISK_SIZE ..."
+        sudo qm disk resize $TEMPLATE_VM_ID scsi0 $SYSTEM_DISK_SIZE
     else
-        echo "Disk image resize ignored"
+        echo "System Disk image resize ignored"
+    fi
+
+    if [ $DATA_DISK_SIZE != "0G" ]
+    then
+        echo "Create the disk data disk with size equal to $DATA_DISK_SIZE ..."
+        sudo qm set $TEMPLATE_VM_ID --scsi1 $STORAGE:$DATA_DISK_SIZE,aio=io_uring,cache=unsafe,discard=on,iothread=1,ssd=1 
+    else
+        echo "Data Disk image creation ignored"
     fi
 
     sudo sync
@@ -94,7 +100,7 @@ download_vm_disk_image(){
 
     echo ""
     echo "-----------------------------------------------------------------"
-    if [ -n "$IMAGE_URL" ] && [ -n "$IMAGE_PATH" ] && [ -n "$DISKIMAGE_SIZE" ]; then
+    if [ -n "$IMAGE_URL" ] && [ -n "$IMAGE_PATH" ] && [ -n "$SYSTEM_DISK_SIZE" ] && [ -n "$DATA_DISK_SIZE" ]; then
     
         if [ -e $IMAGE_PATH ]
         then
@@ -106,7 +112,7 @@ download_vm_disk_image(){
         fi
 
     else
-        echo "ERROR: IMAGE_URL/IMAGE_PATH/DISKIMAGE_SIZE are not well provided for the download_vm_disk_image function."
+        echo "ERROR: IMAGE_URL/IMAGE_PATH/__SYS__<>__IMAGE_SIZE are not well provided for the download_vm_disk_image function."
         echo "Exiting."
         exit -1
     fi
