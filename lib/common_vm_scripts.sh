@@ -106,7 +106,7 @@ download_vm_disk_image(){
 
     echo ""
     echo "-----------------------------------------------------------------"
-    if [ -n "$IMAGE_URL" ] && [ -n "$IMAGE_PATH" ] && [ -n "$SYSTEM_DISK_SIZE" ] && [ -n "$DATA_DISK_SIZE" ]; then
+    if [ -n "$IMAGE_URL" ] && [ -n "$IMAGE_PATH" ] && [ -n "$SYSTEM_DISK_SIZE" ]; then
     
         if [ -e $IMAGE_PATH ]
         then
