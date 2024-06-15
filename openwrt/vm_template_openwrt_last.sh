@@ -15,7 +15,7 @@ BRIDGE2=vmbr1
 COMPRESSED_IMAGE=/tmp/openwrt.img.gz
 DISKIMAGE=/tmp/openwrt.img
 DISKIMAGE_SIZE=1G
-STORAGE=local-lvm
+STORAGE=local-zfs
 
 #----------------------------------------------------
 # create the template
