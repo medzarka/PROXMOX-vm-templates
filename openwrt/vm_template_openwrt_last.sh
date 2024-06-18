@@ -7,7 +7,7 @@
 #----------------------------------------------------
 # template configuration
 TEMPLATE_NAME=template-openwrt
-VMID=9002
+VMID=5300
 RAM=512
 CORES=1
 BRIDGE1=vmbr0
