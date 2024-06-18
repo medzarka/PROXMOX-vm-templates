@@ -1,6 +1,6 @@
 echo ' 1 - Network configurations:'
 
-echo '' > /etc/config/network
+echo "" > /etc/config/network
 uci set network.loopback=interface
 uci set network.loopback.proto='static'
 uci set network.loopback.ipaddr='127.0.0.1'
@@ -44,15 +44,23 @@ uci set network.@device[-1].ifname='eth1'
 uci set network.@device[-1].vid='40'
 uci set network.@device[-1].name='eth1.40'
 uci set network.@device[-1].ipv6='0'
+#uci set network.@device[0]=device
+uci add network device
+uci set network.@device[-1].type='8021q'
+uci set network.@device[-1].ifname='eth1'
+uci set network.@device[-1].vid='50'
+uci set network.@device[-1].name='eth1.50'
+uci set network.@device[-1].ipv6='0'
+
 uci set network.LAN_HOST=interface
 uci set network.LAN_HOST.proto='static'
-uci set network.LAN_HOST.device='eth1.10'
-uci set network.LAN_HOST.ipaddr='192.168.10.1'
+uci set network.LAN_HOST.device='eth1.20'
+uci set network.LAN_HOST.ipaddr='192.168.20.1'
 uci set network.LAN_HOST.netmask='255.255.255.0'
 uci set network.DMZ=interface
 uci set network.DMZ.proto='static'
-uci set network.DMZ.device='eth1.20'
-uci set network.DMZ.ipaddr='192.168.20.1'
+uci set network.DMZ.device='eth1.10'
+uci set network.DMZ.ipaddr='192.168.10.1'
 uci set network.DMZ.netmask='255.255.255.0'
 uci set network.LAN_VMs=interface
 uci set network.LAN_VMs.proto='static'
@@ -64,6 +72,11 @@ uci set network.LAN_LXCs.proto='static'
 uci set network.LAN_LXCs.device='eth1.40'
 uci set network.LAN_LXCs.ipaddr='192.168.40.1'
 uci set network.LAN_LXCs.netmask='255.255.255.0'
+uci set network.LAN_TEMPLATES=interface
+uci set network.LAN_TEMPLATES.proto='static'
+uci set network.LAN_TEMPLATES.device='eth1.50'
+uci set network.LAN_TEMPLATES.ipaddr='192.168.50.1'
+uci set network.LAN_TEMPLATES.netmask='255.255.255.0'
 uci commit 
 reload_config
 
@@ -103,6 +116,7 @@ uci delete firewall.@zone[-1].network > /dev/null 2>&1
 uci add_list firewall.@zone[-1].network='LAN_HOST'
 uci add_list firewall.@zone[-1].network='LAN_LXCs'
 uci add_list firewall.@zone[-1].network='LAN_VMs'
+uci add_list firewall.@zone[-1].network='LAN_TEMPLATES'
 #uci set firewall.@zone[0].network='LAN_HOST' 'LAN_LXCs' 'LAN_VMs'
 #uci set firewall.@zone[1]=zone
 uci add firewall zone > /dev/null
@@ -122,7 +136,7 @@ uci set firewall.@zone[-1].name='dmz'
 uci set firewall.@zone[-1].input='ACCEPT'
 uci set firewall.@zone[-1].output='ACCEPT'
 uci set firewall.@zone[-1].forward='REJECT'
-uci set firewall.@zone[-1].device='eth1.20'
+uci set firewall.@zone[-1].device='eth1.10'
 uci set firewall.@zone[-1].family='ipv4'
 uci set firewall.@zone[-1].network='DMZ'
 echo '      Configuring firewall zones forwarding'

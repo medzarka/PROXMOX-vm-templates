@@ -70,6 +70,7 @@ fi
 
 if [ "$LINUX_DISTRIBUTION" = "Alpine" ]; then
 doas sed -i 's/#http/http/g' /etc/apk/repositories # enable community repository
+doas sed -i -e 's/v3\.19/v3\.20/g' /etc/apk/repositories # upgrade from 3.19 to 3.20
 doas apk update
 doas apk --no-cache add parted
 doas apk upgrade --no-cache --available
@@ -225,6 +226,11 @@ doas ufw limit SSH
 doas ufw --force enable
 doas rc-service ufw restart
 doas rc-update add ufw default
+
+
+
+# TODO https://www.ubuntumint.com/setup-awall-firewall-alpine-linux/
+# TODO https://www.zsiegel.com/2022/01/13/configuring-alpine-linux-firewall-with-docker
 fi
 
 if [ "$LINUX_DISTRIBUTION" = "Rocky" ]; then 

@@ -10,13 +10,13 @@ source lib/common_vm_scripts.sh
 
 # [x] Specific VM template configurations
 # Specific configs
-TEMPLATE_VM_ID=5005
+TEMPLATE_VM_ID=5211
 TEMPLATE_TYPE=template
 TEMPLATE_OS=debian
 TEMPLATE_VERSION=11
 RAM=1024
 CORES=1
-IP=192.168.50.5/24
+IP=192.168.50.20/24
 # RECHECK check the size
 SYSTEM_DISK_SIZE=3G
 

@@ -10,7 +10,7 @@ source lib/common_vm_scripts.sh
 
 # [x] Specific VM template configurations
 # Specific configs
-TEMPLATE_VM_ID=5010
+TEMPLATE_VM_ID=5122
 TEMPLATE_TYPE=template
 TEMPLATE_OS=ubuntu
 TEMPLATE_VERSION=22.04
